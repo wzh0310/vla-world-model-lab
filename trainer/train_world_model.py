@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""世界模型联合训练：重建损失 + KL 散度（free bits）+ 奖励预测损失。
+"""世界模型联合训练：重建 + KL（free bits）+ 奖励预测 + 价值预测 四损失。
 
 数据流（20 步序列，单步监督）：
   每步 t 用真实图像 x_t 经编码器得 embed_t，调用 RSSM.observe 得后验状态；
-  后验特征 -> 解码器重建 x_t（重建损失）、-> 奖励头预测 r_t（奖励损失）；
+  后验特征 -> 解码器重建 x_t（重建损失）、-> 奖励头预测 r_t（奖励损失）、
+  -> 价值头预测 V_t（价值损失，目标为该步起的折扣回报）；
   同一 observe 返回的 prior/post 分布参数算 KL（free bits 防初期坍缩）。
-  推理（imagine_step）不参与训练损失，留待后续 rollout。
+  推理（imagine_step / imagine_rollout）不参与训练损失，留待想象策略训练。
 
 用法（vla 环境）：
   python trainer/train_world_model.py --config configs/default.yaml   # 从配置读超参
@@ -35,6 +36,7 @@ sys.path.insert(0, ROOT)
 from fast_loader import GPUSequenceSampler
 from models.vae import ConvEncoder, ConvDecoder
 from models.rssm import RSSM
+from models.heads import RewardHead, ValueHead
 
 
 def parse_args():
@@ -57,6 +59,8 @@ def parse_args():
     ap.add_argument("--free-bits", type=float, default=1.0, help="KL 每元素下限(nats)，防坍缩")
     ap.add_argument("--kl-scale", type=float, default=1.0)
     ap.add_argument("--reward-scale", type=float, default=2.0)
+    ap.add_argument("--value-scale", type=float, default=1.0, help="价值损失权重")
+    ap.add_argument("--gamma", type=float, default=0.99, help="价值目标折扣因子")
     ap.add_argument("--log-interval", type=int, default=50)
     ap.add_argument("--vis-interval", type=int, default=500)
     ap.add_argument("--save-interval", type=int, default=1000)
@@ -93,6 +97,7 @@ def apply_config(args, argv):
         "max_steps": t.get("max_steps"), "warmup_steps": t.get("warmup_steps"),
         "grad_clip": t.get("grad_clip"), "free_bits": t.get("free_bits"),
         "kl_scale": t.get("kl_scale"), "reward_scale": t.get("reward_scale"),
+        "value_scale": t.get("value_scale"), "gamma": t.get("gamma"),
         "log_interval": t.get("log_interval"), "vis_interval": t.get("vis_interval"),
         "save_interval": t.get("save_interval"),
     }
@@ -112,8 +117,25 @@ def kl_gaussian(pm, pl, qm, ql, min_std=0.1):
     return kl  # (B, stoch_dim)
 
 
+def discounted_returns(rewards, gamma):
+    """从每步起的折扣回报，作为价值头的监督目标。
+
+    rewards: (B, T, 1) 归一化奖励（r/10 裁剪 [-1,1]）
+    返回:    (B, T)   G_t = r_t + gamma*r_{t+1} + gamma^2*r_{t+2} + ...
+    采用有限窗口（末端不 bootstrap），因为当前数据为定长 20 步序列。
+    """
+    B, T, _ = rewards.shape
+    r = rewards.squeeze(-1)                       # (B,T)
+    G = torch.zeros_like(r)
+    running = torch.zeros(B, device=r.device, dtype=r.dtype)
+    for t in reversed(range(T)):
+        running = r[:, t] + gamma * running
+        G[:, t] = running
+    return G
+
+
 class WorldModel(nn.Module):
-    """编码器(复用AE) + RSSM + 解码器(264->图像) + 奖励头。"""
+    """编码器(复用AE) + RSSM + 解码器(264->图像) + 奖励头 + 价值头。"""
 
     def __init__(self, latent_dim, stoch_dim, det_dim, ae_ckpt, device):
         super().__init__()
@@ -122,11 +144,9 @@ class WorldModel(nn.Module):
         self.decoder = ConvDecoder(latent_dim=feat_dim)
         self.rssm = RSSM(stoch_dim=stoch_dim, det_dim=det_dim,
                          action_dim=4, embed_dim=latent_dim)
-        self.reward_head = nn.Sequential(
-            nn.Linear(feat_dim, 256), nn.SiLU(),
-            nn.Linear(256, 128), nn.SiLU(),
-            nn.Linear(128, 1),
-        )
+        # 两个头继承 nn.Sequential，权重 key 与旧内联 reward_head 一致（便于兼容历史检查点）
+        self.reward_head = RewardHead(feat_dim)
+        self.value_head = ValueHead(feat_dim)
         # 从 AE 检查点迁移权重：encoder 全部 + decoder 的 deconv 部分
         state = torch.load(ae_ckpt, map_location=device, weights_only=False)
         ae_dim = state.get('latent_dim', latent_dim)
@@ -177,18 +197,29 @@ def main():
     start = 0
     if args.resume:
         st = torch.load(args.resume, map_location=args.device, weights_only=False)
-        model.load_state_dict(st['model'])
-        opt.load_state_dict(st['optimizer'])
+        # 兼容旧检查点（无 value_head）：缺失的 value_head 随机初始化，不强制 strict
+        missing, unexpected = model.load_state_dict(st['model'], strict=False)
+        if missing:
+            print(f"[WM] 续训缺失权重(将随机初始化): {missing}", flush=True)
+        if unexpected:
+            print(f"[WM] 续训多余权重(已忽略): {unexpected}", flush=True)
+        # optimizer 状态含旧参数形状时可能不匹配，尝试加载否则重建
+        try:
+            opt.load_state_dict(st['optimizer'])
+        except ValueError as e:
+            print(f"[WM] optimizer 状态不兼容，重新初始化: {e}", flush=True)
         start = st.get('step', 0)
         print(f"[WM] 续训 {args.resume} step={start}", flush=True)
 
     model.train()
     t0 = time.time()
     step = start
-    acc = {'rec': 0.0, 'kl': 0.0, 'rew': 0.0, 'n': 0}
+    acc = {'rec': 0.0, 'kl': 0.0, 'rew': 0.0, 'val': 0.0, 'n': 0}
     while step < args.max_steps:
         imgs, acts, rews = sampler.sample(args.batch_size, with_rewards=True)  # (B,T,...)
         B, T = imgs.shape[:2]
+        # 价值目标：每步起的折扣回报（归一化尺度，与奖励同源）
+        value_target = discounted_returns(rews, args.gamma)   # (B,T)
         lr = lr_at_step(step, args.lr, args.warmup_steps, args.max_steps)
         for g in opt.param_groups:
             g['lr'] = lr
@@ -199,7 +230,7 @@ def main():
         embeds = embeds.view(B, T, -1)
 
         state = model.rssm.initial_state(B, device=args.device)
-        total_rec = total_kl = total_rew = 0.0
+        total_rec = total_kl = total_rew = total_val = 0.0
         for t in range(T):
             state, info = model.rssm.observe(state, acts[:, t], embeds[:, t])
             feat = model.rssm.get_feature(state)              # (B,264)
@@ -211,14 +242,19 @@ def main():
             kl_t = kl_t.mean(dim=-1).clamp_min(args.free_bits).mean()
             pred_r = model.reward_head(feat).squeeze(-1)      # (B,)
             rew_t = F.mse_loss(pred_r, rews[:, t].squeeze(-1))
+            pred_v = model.value_head(feat).squeeze(-1)       # (B,)
+            val_t = F.mse_loss(pred_v, value_target[:, t])
             total_rec += rec_t
             total_kl += kl_t
             total_rew += rew_t
+            total_val += val_t
 
         loss_rec = total_rec / T
         loss_kl = total_kl / T
         loss_rew = total_rew / T
-        loss = loss_rec + args.kl_scale * loss_kl + args.reward_scale * loss_rew
+        loss_val = total_val / T
+        loss = (loss_rec + args.kl_scale * loss_kl
+                + args.reward_scale * loss_rew + args.value_scale * loss_val)
 
         opt.zero_grad(set_to_none=True)
         loss.backward()
@@ -227,21 +263,22 @@ def main():
         step += 1
 
         acc['rec'] += loss_rec.item(); acc['kl'] += loss_kl.item()
-        acc['rew'] += loss_rew.item(); acc['n'] += 1
+        acc['rew'] += loss_rew.item(); acc['val'] += loss_val.item(); acc['n'] += 1
 
         if step % args.log_interval == 0 or step == 1:
             n = acc['n']
             print(f"[WM] step {step}/{args.max_steps} rec={acc['rec']/n:.5f} "
-                  f"kl={acc['kl']/n:.4f} rew={acc['rew']/n:.5f} "
+                  f"kl={acc['kl']/n:.4f} rew={acc['rew']/n:.5f} val={acc['val']/n:.5f} "
                   f"loss={loss.item():.4f} gnorm={grad_norm.item():.3f} "
                   f"lr={lr:.2e} {time.time()-t0:.0f}s", flush=True)
             writer.add_scalar('loss/recon', acc['rec']/n, step)
             writer.add_scalar('loss/kl', acc['kl']/n, step)
             writer.add_scalar('loss/reward', acc['rew']/n, step)
+            writer.add_scalar('loss/value', acc['val']/n, step)
             writer.add_scalar('loss/total', loss.item(), step)
             writer.add_scalar('train/grad_norm', grad_norm.item(), step)
             writer.add_scalar('train/lr', lr, step)
-            acc = {'rec': 0.0, 'kl': 0.0, 'rew': 0.0, 'n': 0}
+            acc = {'rec': 0.0, 'kl': 0.0, 'rew': 0.0, 'val': 0.0, 'n': 0}
 
         if step % args.vis_interval == 0 or step == args.max_steps:
             model.eval()

@@ -11,7 +11,7 @@
 project:
   name: vla-world-model-lab
   conda_env: vla
-  stage: 单步预测世界模型
+  stage: 世界模型（重建+KL+奖励+价值四损失）
 
 data:
   hdf5_path: outputs/data/trajectories.h5
@@ -33,6 +33,7 @@ model:
     min_std: 0.1              # 标准差下限，防数值不稳定
     action_dim: 4             # 动作 [dx,dy,dz,gripper]
   reward_head: [256, 128]     # 奖励预测 MLP 的隐藏层尺寸
+  value_head: [256, 128]      # 价值预测 MLP 的隐藏层尺寸（与奖励头同构）
 
 training:
   ae:
@@ -57,6 +58,8 @@ training:
                               # 实测 0.2 使真实 KL 从 0.92 降到 0.17，先验预测 +5.7dB
     kl_scale: 1.0             # KL 损失权重
     reward_scale: 2.0         # 奖励损失权重
+    value_scale: 1.0          # 价值损失权重（折扣回报回归）
+    gamma: 0.99               # 价值目标折扣因子
     log_interval: 50
     vis_interval: 500
     save_interval: 1000

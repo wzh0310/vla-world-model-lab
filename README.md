@@ -17,11 +17,14 @@
 | GPU 显存预加载采样 `datasets/fast_loader.py` | ✅ | 约 80× 加速（1000 步从 ~70min → 51s） |
 | 视觉自编码器 `models/vae.py` | ✅ | ConvEncoder/ConvDecoder，64 维隐变量 |
 | RSSM 动力学 `models/rssm.py` | ✅ | 确定性态 200 + 随机态 64，特征 264 维 |
-| 三损失联合训练 `trainer/train_world_model.py` | ✅ | 重建 + KL(free bits) + 奖励，3000 步收敛 |
+| 四损失联合训练 `trainer/train_world_model.py` | ✅ | 重建 + KL(free bits) + 奖励 + 价值，4000 步收敛 |
 | 单步预测全面验证 `trainer/eval_single_step.py` | ✅ | PSNR / SSIM / 奖励 MAE·RMSE，统一评估集 |
 | 预测可视化 `trainer/make_prediction_gif.py` | ✅ | 连续 10 步真实 vs 单步预测对比 GIF |
+| 开环多步预测 `models/rssm.py` `imagine_rollout` | ✅ | 仅首帧+动作，全程不接真实图像，任意步长 |
+| 奖励头 / 价值头 `models/heads.py` | ✅ | 奖励单步回归 + 状态价值（折扣回报监督） |
+| 奖励/价值曲线验证 `trainer/verify_heads.py` | ✅ | 奖励 corr 0.77，价值 corr 0.55（含局限说明） |
 | 统一配置 `configs/default.yaml` | ✅ | data / model / training / eval 四段，命令行优先 |
-| 多步想象 rollout + actor-critic 规划 | ⬜ | 下一阶段目标 |
+| 想象轨迹上的 actor-critic 规划 | ⬜ | 下一阶段目标 |
 
 ---
 
@@ -46,18 +49,19 @@ DreamerV2 风格三段式世界模型：
         │  先验 z_t ~ p(z|h_t)       │  ← imagine_step：纯动力学预测
         └─────────────┬─────────────┘
                       ▼  feature = [h_t, z_t] (264)
-              ┌───────┴────────┐
-              ▼                ▼
-      ┌──────────────┐  ┌──────────────┐
-      │ ConvDecoder  │  │ Reward Head  │
-      │ → x̂_t (图像) │  │ → r̂_t (标量) │
-      └──────────────┘  └──────────────┘
+        ┌─────────────┼─────────────┐
+        ▼             ▼             ▼
+┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+│ ConvDecoder  │ │ Reward Head  │ │ Value Head   │
+│ → x̂_t (图像) │ │ → r̂_t (奖励) │ │ → V̂_t (价值) │
+└──────────────┘ └──────────────┘ └──────────────┘
 ```
 
 - **ConvEncoder**：4 层卷积（通道 32/64/128/256）+ GroupNorm + SiLU → mu / logvar（默认 64 维）。
 - **RSSM**：GRU 确定性态 `h`(200) + 对角高斯随机态 `z`(64，tanh 限幅)，拼接为 264 维特征。
 - **ConvDecoder**：4 层转置卷积，隐特征 → 64×64×3（Tanh 输出 [-1,1]）。
-- **Reward Head**：264 → 256 → 128 → 1 MLP，预测奖励。
+- **Reward Head / Value Head**：264 → 256 → 128 → 1 MLP（继承 `nn.Sequential`，权重
+  key 兼容旧版），分别预测单步奖励与状态价值（折扣回报监督）。
 
 三种推理口径（评估时严格区分）：
 
@@ -141,6 +145,15 @@ $VLA trainer/eval_single_step.py --ckpt outputs/wm_fb02/checkpoints/wm_step00400
 
 # 7) 连续 10 步预测对比 GIF
 $VLA trainer/make_prediction_gif.py --ckpt outputs/wm_fb02/checkpoints/wm_step004000.pt --out-dir outputs/wm_fb02/vis
+
+# 8) 开环多步想象预测（仅首帧+动作，输出对比动图）
+$VLA trainer/test_open_loop.py --ckpt outputs/wm_fb02/checkpoints/wm_step004000.pt --steps 10
+
+# 9) 奖励头 + 价值头四损失联合训练（约 433s / 4000 步）
+$VLA trainer/train_world_model.py --config configs/default.yaml --output-dir outputs/wm_heads
+
+# 10) 奖励/价值曲线验证（corr + MAE + 对比图 → JSON）
+$VLA trainer/verify_heads.py --ckpt outputs/wm_heads/checkpoints/wm_step004000.pt
 ```
 
 `--config` 只填充命令行未显式给出的参数，显式参数始终优先，例如：
@@ -160,9 +173,13 @@ $VLA trainer/train_world_model.py --config configs/default.yaml --max-steps 5000
    下一步：进一步调低 free bits（0.05~0.1）、提高 KL scale，或加入多步想象损失。
 2. **离散隐变量未采用**：当前用对角高斯随机态（tanh 限幅）。下一步可尝试 DreamerV2 的
    categorical 隐变量以提升多步预测稳定性。
-3. **奖励长尾帧误差**：高奖励稀疏帧 RMSE 偏高。下一步：加权损失或分桶评估。
-4. **尚未接入 actor-critic**：世界模型目前仅用于重建 / 预测验证，未用于规划或想象 rollout。
-5. 当前为全量训练、未做轨迹级 held-out 划分，指标反映重建 / 预测保真度，非严格泛化能力。
+3. **奖励尖峰幅值低估**：奖励头与真实曲线相关系数 0.767（趋势一致），但成功帧尖峰
+   （≈1.0）只预测到约 0.05——极稀疏奖励（>0.5 的帧仅 2.56%）下 MSE 倾向预测条件期望。
+4. **价值预测在专家轨迹末段偏低**：相关系数 0.55、MAE 1.06。随机 20 步窗口折扣回报
+   均值近 0，价值头学到"预测接近 0"；专家轨迹末段累积高奖励属分布外外推。
+5. **尚未接入 actor-critic**：奖励/价值头已在真实轨迹上训练，但还没在想象 rollout 上
+   计算 λ-return 与优势，未用于规划。这是下一步目标。
+6. 当前为全量训练、未做轨迹级 held-out 划分，指标反映重建 / 预测保真度，非严格泛化能力。
 
 ---
 
