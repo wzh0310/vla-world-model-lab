@@ -61,6 +61,9 @@ def parse_args():
     ap.add_argument("--reward-scale", type=float, default=2.0)
     ap.add_argument("--value-scale", type=float, default=1.0, help="价值损失权重")
     ap.add_argument("--gamma", type=float, default=0.99, help="价值目标折扣因子")
+    ap.add_argument("--augment", action="store_true", help="开启图像增强（小幅平移+亮度扰动）")
+    ap.add_argument("--shift-px", type=float, default=2.0, help="增强平移幅度(像素)")
+    ap.add_argument("--brightness", type=float, default=0.1, help="增强亮度扰动幅度")
     ap.add_argument("--log-interval", type=int, default=50)
     ap.add_argument("--vis-interval", type=int, default=500)
     ap.add_argument("--save-interval", type=int, default=1000)
@@ -184,7 +187,9 @@ def main():
     writer = SummaryWriter(log_dir)
 
     sampler = GPUSequenceSampler(args.data, seq_len=args.seq_len, image_size=64,
-                                 device=args.device, seed=args.seed)
+                                 device=args.device, seed=args.seed,
+                                 augment=args.augment, shift_px=args.shift_px,
+                                 brightness=args.brightness)
     print(f"[WM] 采样器: {len(sampler)} 序列, 图像显存 {sampler.mem_mb:.1f}MB, "
           f"加载 {sampler.load_sec:.1f}s", flush=True)
 

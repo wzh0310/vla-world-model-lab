@@ -23,6 +23,9 @@
 | 开环多步预测 `models/rssm.py` `imagine_rollout` | ✅ | 仅首帧+动作，全程不接真实图像，任意步长 |
 | 奖励头 / 价值头 `models/heads.py` | ✅ | 奖励单步回归 + 状态价值（折扣回报监督） |
 | 奖励/价值曲线验证 `trainer/verify_heads.py` | ✅ | 奖励 corr 0.77，价值 corr 0.55（含局限说明） |
+| 多步预测调优（KL 权重） | ✅ | free_bits 0.05+kl_scale 1.5，10步开环 22.39→24.71dB |
+| 多步基准评估 `trainer/eval_multistep.py` | ✅ | 多轨迹逐 step PSNR/SSIM，统一对比口径 |
+| 图像增强（可选，`--augment`） | ⚠️ | 已实现但实测损害定位精度，默认关闭 |
 | 统一配置 `configs/default.yaml` | ✅ | data / model / training / eval 四段，命令行优先 |
 | 想象轨迹上的 actor-critic 规划 | ⬜ | 下一阶段目标 |
 
@@ -154,6 +157,15 @@ $VLA trainer/train_world_model.py --config configs/default.yaml --output-dir out
 
 # 10) 奖励/价值曲线验证（corr + MAE + 对比图 → JSON）
 $VLA trainer/verify_heads.py --ckpt outputs/wm_heads/checkpoints/wm_step004000.pt
+
+# 11) 最优模型（KL调优，配置已固化）：四损失训练
+$VLA trainer/train_world_model.py --config configs/default.yaml --output-dir outputs/wm_tune1
+
+# 12) 多轨迹10步开环基准评估（逐 step PSNR/SSIM）
+$VLA trainer/eval_multistep.py --ckpt outputs/wm_tune1/checkpoints/wm_step004000.pt --out-dir outputs/wm_tune1
+
+# 13) 立方体聚焦可视化（第10步立方体是否可辨）
+$VLA trainer/vis_cube_focus.py --ckpt outputs/wm_tune1/checkpoints/wm_step004000.pt --out outputs/wm_tune1/vis/cube_focus.gif
 ```
 
 `--config` 只填充命令行未显式给出的参数，显式参数始终优先，例如：
