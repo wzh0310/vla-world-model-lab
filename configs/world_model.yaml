@@ -1,0 +1,29 @@
+# 世界模型基础配置（离线轨迹数据 + 视觉自编码器 + RSSM）
+data:
+  hdf5_path: outputs/data/trajectories.h5
+  seq_len: 20              # 每条序列固定 20 步
+  image_size: 64           # 224x224 -> 64x64 下采样
+  batch_size: 32
+  num_workers: 4
+  shuffle: true
+  source: null             # null=全部；可选 expert / random
+
+model:
+  latent_dim: 64           # 隐观测 x_t 维度
+  rssm_hidden: 200         # GRU 确定性状态 h_t 维度
+  discrete_classes: 32     # 离散隐状态类别数（DreamerV2 风格）
+  discrete_dims: 32        # 每步分类变量个数
+  decoder_hidden: 256
+
+training:
+  total_steps: 20000
+  lr: 0.0003
+  beta_kl: 0.1             # KL 损失系数
+  free_bits: 1.0           # 每步 KL 下界（nat）
+  log_interval: 100
+  save_interval: 2000
+  device: cuda
+
+eval:
+  num_sequences: 64        # 固定验证集序列数
+  log_images: 8            # TensorBoard 可视化的重建样本数

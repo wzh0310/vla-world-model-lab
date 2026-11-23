@@ -1,13 +1,47 @@
 # vla-world-model-lab
 
-VLA 微调 + VLM 闭环 + 世界模型 + 软体 demo。
+具身智能世界模型实验室：从离线交互轨迹学习「图像 → 隐状态 → 图像」的动力学模型，
+为后续 VLA 策略的想象 rollout / 数据增强提供基础。**全程在 `vla` conda 环境开发。**
 
-## 结构
+## 当前进度
 
-- `configs/` - 实验配置
-- `src/vla_finetune/` - VLA 微调（OpenPI / OpenVLA 路线）
-- `src/vlm_loop/` - VLM 闭环评测
-- `src/world_model/` - 世界模型
-- `src/softbody/` - 软体操作 demo
-- `scripts/` - 训练 / 评测脚本
-- `demos/` - 演示视频与结果
+- [x] 世界模型基础依赖（torchvision / einops / opencv / matplotlib / tensorboard / h5py）
+- [x] 离线轨迹数据集导出（约 100 条，40 专家 + 60 随机，HDF5）
+- [x] 序列数据集类 `datasets/episodic_dataset.py`（20 步序列 / 64×64 / 归一化）
+- [x] DreamerV2 核心理论笔记
+- [ ] 视觉自编码器（编码器 + 解码器）
+- [ ] RSSM 动力学 + 奖励头
+- [ ] 单步预测训练与重建可视化
+
+## 目录结构
+
+```
+vla-world-model-lab/
+├── models/          # 编码器、解码器、RSSM、奖励头模型定义
+├── trainer/         # 训练循环、损失函数、评估逻辑
+├── datasets/        # 数据集加载与预处理（episodic_dataset.py）
+├── configs/         # 超参数配置（world_model.yaml）
+├── utils/           # 可视化、指标计算工具
+├── outputs/         # 训练日志、检查点、可视化结果（不入 git）
+│   └── data/        # trajectories.h5（离线轨迹数据）
+├── scripts/         # 数据导出 / 训练 / 评估脚本
+├── demos/           # 演示视频与结果
+└── docs/            # 中文文档（DreamerV2 理论笔记等）
+```
+
+## 快速开始
+
+```bash
+# 数据与数据集自检（vla 环境）
+/opt/miniconda3/envs/vla/bin/python datasets/episodic_dataset.py --batch-size 8
+
+# 重新导出离线轨迹（mujoco 环境，需 EGL 离屏渲染）
+cd /data/wzh/robot/mujoco-studio-lab
+MUJOCO_GL=egl LIBGL_ALWAYS_SOFTWARE=1 EGL_PLATFORM=surfaceless \
+  /opt/miniconda3/envs/mujoco/bin/python /data/wzh/robot/vla-world-model-lab/scripts/export_trajectories.py
+```
+
+## 关联仓库
+
+- `mujoco-studio-lab`：PushCube 环境与专家轨迹来源
+- `embodied-policy-zoo`：策略算法库（BC/ACT/PPO/IQL/DT），世界模型后续可为其提供想象数据
