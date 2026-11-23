@@ -9,8 +9,12 @@
   推理（imagine_step）不参与训练损失，留待后续 rollout。
 
 用法（vla 环境）：
+  python trainer/train_world_model.py --config configs/default.yaml   # 从配置读超参
   python trainer/train_world_model.py --max-steps 3000 --batch-size 32
+  python trainer/train_world_model.py --config configs/default.yaml --max-steps 5000
   python trainer/train_world_model.py --max-steps 3000 --resume outputs/wm/checkpoints/wm_step001000.pt
+
+注意：--config 只填充命令行未显式给出的参数，显式参数始终优先。
 """
 import argparse
 import math
@@ -35,6 +39,8 @@ from models.rssm import RSSM
 
 def parse_args():
     ap = argparse.ArgumentParser(description="世界模型联合训练")
+    ap.add_argument("--config", default=None,
+                    help="可选 YAML 配置（configs/default.yaml）；显式命令行参数优先")
     ap.add_argument("--data", default=os.path.join(ROOT, "outputs/data/trajectories.h5"))
     ap.add_argument("--ae-ckpt", default=os.path.join(ROOT, "outputs/checkpoints/ae_best.pt"))
     ap.add_argument("--output-dir", default=os.path.join(ROOT, "outputs/wm"))
@@ -57,7 +63,45 @@ def parse_args():
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     ap.add_argument("--resume", default=None)
-    return ap.parse_args()
+    args = ap.parse_args()
+    if args.config:
+        apply_config(args, sys.argv[1:])
+    return args
+
+
+def apply_config(args, argv):
+    """用 YAML 配置填充未在命令行显式给出的参数（显式参数优先）。
+
+    配置来源为 configs/default.yaml 的 data / model.rssm / training.world_model 三段。
+    这样既集中管理超参数，又不破坏已有命令行复现方式。
+    """
+    import yaml
+    with open(args.config, encoding="utf-8") as f:
+        cfg = yaml.safe_load(f)
+    d = cfg.get("data", {})
+    m = cfg.get("model", {})
+    r = m.get("rssm", {})
+    t = cfg.get("training", {}).get("world_model", {})
+
+    # argparse 参数名 -> 配置值
+    mapping = {
+        "data": os.path.join(ROOT, d["hdf5_path"]) if d.get("hdf5_path") else args.data,
+        "seq_len": d.get("seq_len"), "batch_size": d.get("batch_size"), "seed": d.get("seed"),
+        "latent_dim": m.get("latent_dim"),
+        "stoch_dim": r.get("stoch_dim"), "det_dim": r.get("det_dim"),
+        "lr": t.get("lr"), "weight_decay": t.get("weight_decay"),
+        "max_steps": t.get("max_steps"), "warmup_steps": t.get("warmup_steps"),
+        "grad_clip": t.get("grad_clip"), "free_bits": t.get("free_bits"),
+        "kl_scale": t.get("kl_scale"), "reward_scale": t.get("reward_scale"),
+        "log_interval": t.get("log_interval"), "vis_interval": t.get("vis_interval"),
+        "save_interval": t.get("save_interval"),
+    }
+    # 命令行显式指定的参数名（--lr -> lr）
+    explicit = {tok[2:].replace("-", "_") for tok in argv if tok.startswith("--")}
+    for key, value in mapping.items():
+        if value is not None and key not in explicit:
+            setattr(args, key, value)
+    print(f"[CFG] 已加载配置 {args.config}（命令行显式参数优先）", flush=True)
 
 
 def kl_gaussian(pm, pl, qm, ql, min_std=0.1):

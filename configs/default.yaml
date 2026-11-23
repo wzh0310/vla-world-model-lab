@@ -1,0 +1,67 @@
+# ============================================================================
+# vla-world-model-lab 全局默认超参数（单一权威来源 / single source of truth）
+# ----------------------------------------------------------------------------
+# 说明：
+#   - 本文件集中管理数据、模型、训练、评估四组超参数，数值均为已验证配置。
+#   - 训练/评估脚本带 --config 时从本文件读取默认值，命令行显式参数可覆盖。
+#   - configs/world_model.yaml 为早期 AE 训练配置，保留兼容；新实验请以本文件为准。
+#   - 归一化口径：图像 [-1,1]；动作按动作空间线性映射到 [-1,1]；奖励 r/10 裁剪 [-1,1]。
+# ============================================================================
+
+project:
+  name: vla-world-model-lab
+  conda_env: vla
+  stage: 单步预测世界模型
+
+data:
+  hdf5_path: outputs/data/trajectories.h5
+  seq_len: 20                 # 每条训练序列固定 20 步
+  image_size: 64              # 224x224 -> 64x64 双线性下采样
+  batch_size: 32
+  seed: 0
+  action_low: [-0.02, -0.02, -0.02, 0.0]
+  action_high: [0.02, 0.02, 0.02, 1.0]
+  reward_divisor: 10.0        # 奖励归一化分母（r/10 再裁剪 [-1,1]）
+
+model:
+  latent_dim: 64              # ConvEncoder 输出的观测嵌入 / AE 隐变量维度
+  hidden_channels: 32         # 卷积通道基数（4 层：32/64/128/256）
+  rssm:
+    stoch_dim: 64             # 随机隐状态维度（对角高斯，tanh 限幅）
+    det_dim: 200              # GRU 确定性隐藏态维度
+    hidden_dim: 256           # 先验/后验 MLP 隐藏层
+    min_std: 0.1              # 标准差下限，防数值不稳定
+    action_dim: 4             # 动作 [dx,dy,dz,gripper]
+  reward_head: [256, 128]     # 奖励预测 MLP 的隐藏层尺寸
+
+training:
+  ae:
+    lr: 3.0e-4
+    weight_decay: 1.0e-5
+    max_steps: 1000
+    warmup_steps: 100
+    grad_clip: 1.0
+    log_interval: 50
+    vis_interval: 500
+    save_interval: 500
+    eval_interval: 500
+    num_vis: 8
+    fast: true                # GPU 显存预加载采样（约 80x 加速）
+  world_model:
+    lr: 3.0e-4
+    weight_decay: 1.0e-5
+    max_steps: 3000
+    warmup_steps: 100
+    grad_clip: 1.0
+    free_bits: 1.0            # KL 每元素下限(nats)，防先验坍缩
+    kl_scale: 1.0             # KL 损失权重
+    reward_scale: 2.0         # 奖励损失权重
+    log_interval: 50
+    vis_interval: 500
+    save_interval: 1000
+
+eval:
+  windows_per_traj: 4         # 每条轨迹均匀取多少个 20 步窗口构成评估集
+  gif_steps: 10               # 单步预测对比动图的连续步数
+  gif_fps_ms: 700             # 动图每帧停留毫秒数
+  eval_seed: 1234             # 评估集确定性种子
