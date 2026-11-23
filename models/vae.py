@@ -1,0 +1,108 @@
+# -*- coding: utf-8 -*-
+"""视觉自编码器：ConvEncoder + ConvDecoder（DreamerV2 视觉通道的独立版本）。
+
+- ConvEncoder: 4 层卷积 (64->32->16->8->4) + 归一化，输出隐分布参数 mu / logvar
+- ConvDecoder: 4 层转置卷积 (4->8->16->32->64)，隐变量还原为 64x64x3
+- 隐变量默认 32 维；本阶段为纯自编码器，暂不接入 RSSM 确定性状态 h_t。
+
+归一化说明：使用 GroupNorm(num_groups=1)，即对所有通道做归一化，
+是卷积特征图上「层归一化」的标准实现（对小 batch 稳定，不依赖 batch 统计）。
+"""
+from typing import Dict, Optional, Tuple
+
+import torch
+import torch.nn as nn
+
+
+class ConvEncoder(nn.Module):
+    """4 层卷积编码器：64x64x3 -> 隐分布 (mu, logvar)。"""
+
+    def __init__(self, in_channels: int = 3, latent_dim: int = 32,
+                 hidden_channels: int = 32):
+        super().__init__()
+        if latent_dim < 1 or hidden_channels < 1:
+            raise ValueError("latent_dim 和 hidden_channels 必须为正整数")
+        c1, c2, c3, c4 = (hidden_channels, hidden_channels * 2,
+                          hidden_channels * 4, hidden_channels * 8)
+        self.conv = nn.Sequential(
+            nn.Conv2d(in_channels, c1, 4, stride=2, padding=1), nn.GroupNorm(1, c1), nn.SiLU(),
+            nn.Conv2d(c1, c2, 4, stride=2, padding=1), nn.GroupNorm(1, c2), nn.SiLU(),
+            nn.Conv2d(c2, c3, 4, stride=2, padding=1), nn.GroupNorm(1, c3), nn.SiLU(),
+            nn.Conv2d(c3, c4, 4, stride=2, padding=1), nn.GroupNorm(1, c4), nn.SiLU(),
+        )  # 输出 (B, c4, 4, 4)
+        self.flat_dim = c4 * 4 * 4
+        self.head = nn.Linear(self.flat_dim, 2 * latent_dim)
+
+    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        if x.ndim != 4 or x.shape[-2:] != (64, 64):
+            raise ValueError(f"编码器只接受 (B,3,64,64) 图像，得到 {tuple(x.shape)}")
+        h = self.conv(x).flatten(1)
+        mu, logvar = self.head(h).chunk(2, dim=1)
+        return mu, logvar
+
+
+class ConvDecoder(nn.Module):
+    """4 层转置卷积解码器：隐变量 z -> 64x64x3（tanh 输出，范围 [-1,1]）。"""
+
+    def __init__(self, latent_dim: int = 32, out_channels: int = 3,
+                 hidden_channels: int = 32):
+        super().__init__()
+        c1, c2, c3, c4 = (hidden_channels, hidden_channels * 2,
+                          hidden_channels * 4, hidden_channels * 8)
+        self.flat_dim = c4 * 4 * 4
+        self.project = nn.Linear(latent_dim, self.flat_dim)
+        self.deconv = nn.Sequential(
+            nn.ConvTranspose2d(c4, c3, 4, stride=2, padding=1), nn.GroupNorm(1, c3), nn.SiLU(),
+            nn.ConvTranspose2d(c3, c2, 4, stride=2, padding=1), nn.GroupNorm(1, c2), nn.SiLU(),
+            nn.ConvTranspose2d(c2, c1, 4, stride=2, padding=1), nn.GroupNorm(1, c1), nn.SiLU(),
+            nn.ConvTranspose2d(c1, out_channels, 4, stride=2, padding=1),
+            nn.Tanh(),
+        )
+
+    def forward(self, z: torch.Tensor) -> torch.Tensor:
+        if z.ndim != 2:
+            raise ValueError(f"解码器只接受 (B,latent_dim) 隐变量，得到 {tuple(z.shape)}")
+        h = self.project(z).view(-1, self.flat_dim // 16, 4, 4)  # c4 通道
+        return self.deconv(h)
+
+
+class ConvVAE(nn.Module):
+    """编码器 + 解码器封装：支持重参数化采样，或直接取 mu（纯 AE 模式）。"""
+
+    def __init__(self, latent_dim: int = 32, hidden_channels: int = 32,
+                 in_channels: int = 3):
+        super().__init__()
+        self.latent_dim = int(latent_dim)
+        self.encoder = ConvEncoder(in_channels, self.latent_dim, hidden_channels)
+        self.decoder = ConvDecoder(self.latent_dim, in_channels, hidden_channels)
+
+    @staticmethod
+    def reparameterize(mu: torch.Tensor, logvar: torch.Tensor) -> torch.Tensor:
+        std = torch.exp(0.5 * logvar)
+        return mu + torch.randn_like(std) * std
+
+    def forward(self, x: torch.Tensor, sample: bool = False) -> Dict[str, torch.Tensor]:
+        mu, logvar = self.encoder(x)
+        z = self.reparameterize(mu, logvar) if sample else mu
+        recon = self.decoder(z)
+        return {"recon": recon, "mu": mu, "logvar": logvar, "z": z}
+
+    def count_parameters(self) -> int:
+        return sum(p.numel() for p in self.parameters() if p.requires_grad)
+
+
+if __name__ == "__main__":
+    torch.manual_seed(0)
+    model = ConvVAE(latent_dim=32).eval()
+    x = torch.randn(2, 3, 64, 64)
+    with torch.no_grad():
+        out = model(x)
+        out_s = model(x, sample=True)
+    print(f"输入图像: {tuple(x.shape)}")
+    for name, tensor in out.items():
+        print(f"  {name}: {tuple(tensor.shape)}")
+    assert out["recon"].shape == x.shape, "重建形状与输入不匹配"
+    assert out["mu"].shape == (2, 32) and out["logvar"].shape == (2, 32)
+    assert out_s["z"].shape == (2, 32)
+    assert not torch.equal(out_s["z"], out["z"]), "采样模式应产生随机隐变量"
+    print(f"SHAPE_OK  参数量={model.count_parameters():,}  重建范围=[{float(out['recon'].min()):.3f}, {float(out['recon'].max()):.3f}]")
