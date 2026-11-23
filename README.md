@@ -73,28 +73,33 @@ DreamerV2 风格三段式世界模型：
 
 评估集：覆盖全部 100 条轨迹，每条均匀取 4 个 20 步窗口，共 **400 序列 × 19 个评分帧**
 （t=1..19 三种口径对齐比较）。图像归一化到 [-1,1]，PSNR 峰值取 2²=4。
-完整数据见 `outputs/wm/metrics/single_step_eval.json`（输出目录不入 git）。
+完整数据见 `outputs/wm_fb02/metrics/single_step_eval.json`（输出目录不入 git）。
 
 ### 3.1 图像重建 / 预测
 
 | 口径 | PSNR (dB) | SSIM |
 |---|---|---|
 | 纯 AE 重建 | 29.69 ± 2.79 | 0.9225 ± 0.0344 |
-| WM 后验重建（上界） | **32.57 ± 2.83** | **0.9602 ± 0.0144** |
-| WM 先验单步预测 | 23.38 ± 1.80 | 0.7343 ± 0.0802 |
+| WM 后验重建（上界） | **33.00 ± 2.75** | **0.9651 ± 0.0114** |
+| WM 先验单步预测 | **29.08 ± 2.41** | **0.9474 ± 0.0163** |
 
 - 后验重建优于纯 AE，说明 RSSM 隐状态在压缩之外保留了额外时序/结构信息。
-- 先验单步预测比后验低约 9 dB，但仍能辨认桌面、红点目标与机械臂轮廓；
-  这是 VAE 类世界模型纯动力学预测的典型现象（详见「已知限制」）。
+- 先验单步预测与后验的差距缩小到约 4 dB，桌面、红点目标、机械臂轮廓清晰可辨。
 - 口径说明：本评估覆盖含专家难例的全部轨迹，比早期"随机帧整体采样"口径更严格，
   因此纯 AE 的绝对 PSNR 数值与早期单次采样结果不完全可比；同表内三口径横向可比。
+
+**关键调参证据（free bits 修正）**：初版 `free_bits=1.0` 时真实 KL 约 0.92 被全部 clamp、
+KL 梯度为零，先验预测仅 23.38 dB / SSIM 0.734（画面糊）。诊断后改为 `free_bits=0.2`
+并重训 4000 步，真实 KL 从 0.92 降到 0.17，先验预测提升到 29.08 dB / SSIM 0.947
+（**+5.7 dB**），后验-先验差距从 9 dB 缩到 4 dB。这验证了「先验学习压力不足是模糊主因」
+的诊断。诊断工具：`trainer/diag_kl.py`。
 
 ### 3.2 奖励预测（原始奖励尺度）
 
 | 口径 | MAE | RMSE | bias |
 |---|---|---|---|
-| 后验奖励 | 0.1493 | 0.9661 | -0.076 |
-| 先验奖励 | 0.1484 | 0.9848 | -0.086 |
+| 后验奖励 | 0.1494 | 0.9658 | -0.076 |
+| 先验奖励 | 0.1506 | 0.9756 | -0.077 |
 
 样本量 7600。MAE 约 0.15（奖励量级最大 ~10），方向性可用；RMSE 偏高源于少数
 "成功推到目标"的高奖励帧难以精确回归（奖励稀疏、分布长尾）。
@@ -104,7 +109,7 @@ DreamerV2 风格三段式世界模型：
 - `prediction_single_step.gif`：连续 10 步真实帧 vs 单步预测帧逐帧对比动图。
 - `prediction_single_step.png`：2×10 静态对比网格（上排真实、下排预测）。
 
-（以上位于 `outputs/wm/vis/`，输出目录不入 git，可运行脚本重新生成。）
+（以上位于 `outputs/wm_fb02/vis/`，输出目录不入 git，可运行脚本重新生成。）
 
 ---
 
@@ -125,14 +130,17 @@ $VLA trainer/train_ae.py --config configs/world_model.yaml --max-steps 1000
 # 3) AE 效果验收（PSNR + 对比图）
 $VLA trainer/eval_ae.py --ckpt outputs/checkpoints/ae_best.pt
 
-# 4) 世界模型三损失联合训练（约 326s / 3000 步）
-$VLA trainer/train_world_model.py --config configs/default.yaml
+# 4) 世界模型三损失联合训练（约 395s / 4000 步，free_bits=0.2）
+$VLA trainer/train_world_model.py --config configs/default.yaml --output-dir outputs/wm_fb02
 
-# 5) 单步预测全面验证（PSNR / SSIM / 奖励误差 → JSON）
-$VLA trainer/eval_single_step.py --ckpt outputs/wm/checkpoints/wm_step003000.pt
+# 5) KL 诊断（确认先验学到：真实 KL 应从 0.92 降到约 0.17）
+$VLA trainer/diag_kl.py outputs/wm_fb02/checkpoints/wm_step004000.pt
 
-# 6) 连续 10 步预测对比 GIF
-$VLA trainer/make_prediction_gif.py --ckpt outputs/wm/checkpoints/wm_step003000.pt
+# 6) 单步预测全面验证（PSNR / SSIM / 奖励误差 → JSON）
+$VLA trainer/eval_single_step.py --ckpt outputs/wm_fb02/checkpoints/wm_step004000.pt --out-dir outputs/wm_fb02
+
+# 7) 连续 10 步预测对比 GIF
+$VLA trainer/make_prediction_gif.py --ckpt outputs/wm_fb02/checkpoints/wm_step004000.pt --out-dir outputs/wm_fb02/vis
 ```
 
 `--config` 只填充命令行未显式给出的参数，显式参数始终优先，例如：
@@ -147,10 +155,11 @@ $VLA trainer/train_world_model.py --config configs/default.yaml --max-steps 5000
 
 ## 五、已知限制与下一步
 
-1. **KL 恒为阈值 1.0**：free bits 下限使 KL 项几乎不产生梯度，先验学习压力不足，
-   是单步预测偏模糊的主因。下一步：调低 free bits（0.1~0.3）或加入多步想象损失。
-2. **先验预测偏模糊**：23 dB / SSIM 0.73，结构在但纹理缺失。下一步：更长训练、提高 KL scale，
-   或改用 DreamerV2 的离散（categorical）隐变量。
+1. **先验与后验仍有约 4 dB 差距**：free bits 从 1.0 降到 0.2 后先验预测从 23.38 提升到
+   29.08 dB（已解决"糊"的主要问题），但纯动力学预测仍比看到真值的后验重建略模糊。
+   下一步：进一步调低 free bits（0.05~0.1）、提高 KL scale，或加入多步想象损失。
+2. **离散隐变量未采用**：当前用对角高斯随机态（tanh 限幅）。下一步可尝试 DreamerV2 的
+   categorical 隐变量以提升多步预测稳定性。
 3. **奖励长尾帧误差**：高奖励稀疏帧 RMSE 偏高。下一步：加权损失或分桶评估。
 4. **尚未接入 actor-critic**：世界模型目前仅用于重建 / 预测验证，未用于规划或想象 rollout。
 5. 当前为全量训练、未做轨迹级 held-out 划分，指标反映重建 / 预测保真度，非严格泛化能力。
