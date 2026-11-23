@@ -41,7 +41,7 @@ class GPUSequenceSampler:
                                   mode="bilinear", align_corners=False)
             small = (small / 127.5 - 1.0).half()  # (N,3,S,S) float16 in [-1,1]
             del raw_t
-            self.images, self.actions = [], []
+            self.images, self.actions, self.rewards = [], [], []
             index = []
             offset = 0
             for tid, k in enumerate(keys):
@@ -49,6 +49,8 @@ class GPUSequenceSampler:
                 self.images.append(small[offset:offset + n])
                 a = torch.as_tensor(f[k]["actions"][:], dtype=torch.float32, device=device)
                 self.actions.append(((a - low) / span * 2 - 1).clamp(-1, 1))
+                r = torch.as_tensor(f[k]["rewards"][:], dtype=torch.float32, device=device)
+                self.rewards.append((r / 10.0).clamp(-1, 1)[:, None])  # (n,1)
                 for s in range(0, n - seq_len + 1):
                     index.append((tid, s))
                 offset += n
@@ -60,15 +62,21 @@ class GPUSequenceSampler:
     def __len__(self):
         return len(self.index)
 
-    def sample(self, batch_size):
-        """随机取一个 batch（有放回），返回 (B,T,3,S,S) 图像张量（显存）。
+    def sample(self, batch_size, with_rewards=False):
+        """随机取一个 batch（有放回），返回图像 (B,T,3,S,S) + 动作 (B,T,4)。
 
-        同时返回动作序列 (B,T,4)，供后续 RSSM/奖励头训练复用。
+        with_rewards=True 时额外返回归一化奖励 (B,T,1)，供世界模型奖励头训练。
+        默认 False 保持与 AE 训练脚本的两元组接口兼容。
         """
         sel = self.index[self.rng.integers(0, len(self.index), size=batch_size)]
-        imgs, acts = [], []
+        imgs, acts, rews = [], [], []
         for tid, s in sel:
             t, s = int(tid), int(s)
             imgs.append(self.images[t][s:s + self.seq_len].float())
             acts.append(self.actions[t][s:s + self.seq_len])
-        return torch.stack(imgs, 0), torch.stack(acts, 0)
+            if with_rewards:
+                rews.append(self.rewards[t][s:s + self.seq_len])
+        out = (torch.stack(imgs, 0), torch.stack(acts, 0))
+        if with_rewards:
+            out = out + (torch.stack(rews, 0),)
+        return out

@@ -12,7 +12,9 @@
 - [x] 视觉自编码器（编码器 + 解码器，64 维隐变量；MSE 0.006 / PSNR 41dB，全量训练 51 秒）
 - [x] 自编码器训练脚本（MSE / LR 衰减 / 检查点 / TensorBoard / 重建可视化；GPU 内存预加载 80x 加速）
 - [x] RSSM 动力学骨架（observe / imagine_step / get_feature，特征 264 维）
-- [ ] 奖励头 + 单步预测训练
+- [x] 世界模型联合训练（重建+KL+奖励三损失，free bits；3000步收敛，重建 MSE 0.003）
+- [x] 单步预测验证（后验重建 32.87dB，先验预测 20.53dB）
+- [ ] 多步想象 rollout + actor-critic 规划
 - [ ] 单步预测训练与重建可视化
 
 ## 目录结构
