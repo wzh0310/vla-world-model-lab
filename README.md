@@ -25,6 +25,7 @@
 | 奖励/价值曲线验证 `trainer/verify_heads.py` | ✅ | 奖励 corr 0.77，价值 corr 0.55（含局限说明） |
 | 多步预测调优（KL 权重） | ✅ | free_bits 0.05+kl_scale 1.5，10步开环 22.39→24.71dB |
 | 多步基准评估 `trainer/eval_multistep.py` | ✅ | 多轨迹逐 step PSNR/SSIM，统一对比口径 |
+| 多步长全面评估 `trainer/eval_multistep_full.py` | ✅ | 1/5/10/20 步 PSNR 衰减 + 各步长奖励误差 + 折线图 + 3 组轨迹视频 |
 | 图像增强（可选，`--augment`） | ⚠️ | 已实现但实测损害定位精度，默认关闭 |
 | 统一配置 `configs/default.yaml` | ✅ | data / model / training / eval 四段，命令行优先 |
 | 想象轨迹上的 actor-critic 规划 | ⬜ | 下一阶段目标 |
@@ -166,6 +167,9 @@ $VLA trainer/eval_multistep.py --ckpt outputs/wm_tune1/checkpoints/wm_step004000
 
 # 13) 立方体聚焦可视化（第10步立方体是否可辨）
 $VLA trainer/vis_cube_focus.py --ckpt outputs/wm_tune1/checkpoints/wm_step004000.pt --out outputs/wm_tune1/vis/cube_focus.gif
+
+# 14) 多步长全面评估（1/5/10/20 步 PSNR 衰减 + 奖励误差 + 折线图 + 3组轨迹视频）
+$VLA trainer/eval_multistep_full.py --ckpt outputs/wm_tune1/checkpoints/wm_step004000.pt
 ```
 
 `--config` 只填充命令行未显式给出的参数，显式参数始终优先，例如：
