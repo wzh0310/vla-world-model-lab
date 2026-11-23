@@ -26,9 +26,11 @@
 | 多步预测调优（KL 权重） | ✅ | free_bits 0.05+kl_scale 1.5，10步开环 22.39→24.71dB |
 | 多步基准评估 `trainer/eval_multistep.py` | ✅ | 多轨迹逐 step PSNR/SSIM，统一对比口径 |
 | 多步长全面评估 `trainer/eval_multistep_full.py` | ✅ | 1/5/10/20 步 PSNR 衰减 + 各步长奖励误差 + 折线图 + 3 组轨迹视频 |
+| 极简策略网络 `models/policy.py` | ✅ | MLP 隐状态→动作（tanh 限幅），约 10 万参数 |
+| 想象策略训练 Demo `trainer/imagine_policy.py` | ✅ | 世界模型内想象→奖励回报→可微反传更新策略，回报 1.32→2.59 上升 |
 | 图像增强（可选，`--augment`） | ⚠️ | 已实现但实测损害定位精度，默认关闭 |
 | 统一配置 `configs/default.yaml` | ✅ | data / model / training / eval 四段，命令行优先 |
-| 想象轨迹上的 actor-critic 规划 | ⬜ | 下一阶段目标 |
+| 完整 DreamerV2 闭环（λ-return + 价值引导 + 策略蒸馏） | ⬜ | 下一阶段目标 |
 
 ---
 
@@ -170,6 +172,12 @@ $VLA trainer/vis_cube_focus.py --ckpt outputs/wm_tune1/checkpoints/wm_step004000
 
 # 14) 多步长全面评估（1/5/10/20 步 PSNR 衰减 + 奖励误差 + 折线图 + 3组轨迹视频）
 $VLA trainer/eval_multistep_full.py --ckpt outputs/wm_tune1/checkpoints/wm_step004000.pt
+
+# 15) 想象策略训练最小 Demo（固定起点，想象回报单调上升 + 趋势图）
+$VLA trainer/imagine_policy.py --ckpt outputs/wm_tune1/checkpoints/wm_step004000.pt --iters 300 --fixed-init
+
+# 16) 想象策略训练（价值头 baseline 版，Dreamer critic 降方差）
+$VLA trainer/imagine_policy.py --iters 300 --fixed-init --baseline
 ```
 
 `--config` 只填充命令行未显式给出的参数，显式参数始终优先，例如：
@@ -193,8 +201,10 @@ $VLA trainer/train_world_model.py --config configs/default.yaml --max-steps 5000
    （≈1.0）只预测到约 0.05——极稀疏奖励（>0.5 的帧仅 2.56%）下 MSE 倾向预测条件期望。
 4. **价值预测在专家轨迹末段偏低**：相关系数 0.55、MAE 1.06。随机 20 步窗口折扣回报
    均值近 0，价值头学到"预测接近 0"；专家轨迹末段累积高奖励属分布外外推。
-5. **尚未接入 actor-critic**：奖励/价值头已在真实轨迹上训练，但还没在想象 rollout 上
-   计算 λ-return 与优势，未用于规划。这是下一步目标。
+5. **想象策略 Demo 存在 model exploitation**：想象回报训练中 1.32→2.59 单调上升（链路已验证），
+   但专家动作的想象回报(0.48)反而低于随机策略(1.69)——奖励头在后验特征上训练、想象用先验特征
+   有分布偏移，策略学会了利用奖励头偏好。**"想象回报上升"不等于"真实性能上升"**。下一步需
+   λ-return + 价值引导 + 策略蒸馏 + 真实环境定期评估。详见 `docs/想象策略训练Demo说明.md`。
 6. 当前为全量训练、未做轨迹级 held-out 划分，指标反映重建 / 预测保真度，非严格泛化能力。
 
 ---
@@ -205,7 +215,7 @@ $VLA trainer/train_world_model.py --config configs/default.yaml --max-steps 5000
 vla-world-model-lab/
 ├── configs/         # default.yaml（推荐）+ world_model.yaml（早期兼容）
 ├── datasets/        # episodic_dataset.py（序列数据集）、fast_loader.py（GPU 预加载）
-├── models/          # vae.py（编码器/解码器）、rssm.py（RSSM 动力学）
+├── models/          # vae.py（编码器/解码器）、rssm.py（RSSM）、heads.py（奖励/价值头）、policy.py（策略网络）
 ├── trainer/         # 训练与评估脚本（train_ae / train_world_model / eval / verify / gif）
 ├── utils/           # 工具模块
 ├── outputs/         # 数据、检查点、日志、可视化、指标（不入 git）
