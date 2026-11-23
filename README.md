@@ -9,9 +9,10 @@
 - [x] 离线轨迹数据集导出（约 100 条，40 专家 + 60 随机，HDF5）
 - [x] 序列数据集类 `datasets/episodic_dataset.py`（20 步序列 / 64×64 / 归一化）
 - [x] DreamerV2 核心理论笔记
-- [x] 视觉自编码器（编码器 + 解码器，32 维隐变量）
-- [x] 自编码器训练脚本（MSE / LR 衰减 / 检查点 / TensorBoard / 重建可视化）
-- [ ] RSSM 动力学 + 奖励头
+- [x] 视觉自编码器（编码器 + 解码器，64 维隐变量；MSE 0.006 / PSNR 41dB，全量训练 51 秒）
+- [x] 自编码器训练脚本（MSE / LR 衰减 / 检查点 / TensorBoard / 重建可视化；GPU 内存预加载 80x 加速）
+- [x] RSSM 动力学骨架（observe / imagine_step / get_feature，特征 264 维）
+- [ ] 奖励头 + 单步预测训练
 - [ ] 单步预测训练与重建可视化
 
 ## 目录结构

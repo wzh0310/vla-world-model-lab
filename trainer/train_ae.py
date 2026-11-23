@@ -27,6 +27,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(ROOT, "datasets"))
 sys.path.insert(0, ROOT)
 from episodic_dataset import EpisodicDataset
+from fast_loader import GPUSequenceSampler
 from models.vae import ConvVAE
 
 
@@ -39,7 +40,7 @@ def parse_args():
     ap.add_argument("--image-size", type=int, default=64)
     ap.add_argument("--seq-len", type=int, default=20)
     ap.add_argument("--batch-size", type=int, default=32)
-    ap.add_argument("--num-workers", type=int, default=4)
+    ap.add_argument("--num-workers", type=int, default=0)
     ap.add_argument("--lr", type=float, default=3e-4)
     ap.add_argument("--weight-decay", type=float, default=1e-5)
     ap.add_argument("--max-steps", type=int, default=20000)
@@ -53,6 +54,10 @@ def parse_args():
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     ap.add_argument("--resume", default=None, help="检查点路径，续训")
+    ap.add_argument("--fast", dest="fast", action="store_true", default=True,
+                    help="GPU 内存预加载采样（默认开启，约 80x 加速）")
+    ap.add_argument("--no-fast", dest="fast", action="store_false",
+                    help="回退到 DataLoader + EpisodicDataset（慢）")
     args = ap.parse_args()
     if args.config:
         import yaml
@@ -108,18 +113,25 @@ def main():
     for d in (ckpt_dir, vis_dir, log_dir):
         os.makedirs(d, exist_ok=True)
 
-    dataset = EpisodicDataset(args.data, seq_len=args.seq_len, image_size=args.image_size)
-    loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True,
-                        num_workers=args.num_workers, pin_memory=(args.device == "cuda"),
-                        drop_last=True, persistent_workers=args.num_workers > 0)
-    # 固定一小批验证样本（用固定 seed 的独立 loader）
-    val_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, num_workers=0)
-    val_batches, val_count = [], 0
-    val_gen = iter(val_loader)
-    for _ in range(2):
-        b = next(val_gen)
-        val_batches.append(b["image_seq"][:8])
-    val_x = torch.cat(val_batches, dim=0)
+    if args.fast:
+        sampler = GPUSequenceSampler(args.data, seq_len=args.seq_len,
+                                     image_size=args.image_size,
+                                     device=args.device, seed=args.seed)
+        loader = None
+        dataset = sampler
+        print(f"[AE] GPU 预加载: {len(sampler)} 序列, 图像显存 {sampler.mem_mb:.1f}MB, "
+              f"加载 {sampler.load_sec:.1f}s", flush=True)
+        # 固定验证帧：从采样器取一批后取前 16 帧
+        val_x = sampler.sample(min(16, args.batch_size))[0][:, :1]  # (B,1,3,H,W)
+    else:
+        dataset = EpisodicDataset(args.data, seq_len=args.seq_len, image_size=args.image_size)
+        loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True,
+                            num_workers=args.num_workers, pin_memory=(args.device == "cuda"),
+                            drop_last=True, persistent_workers=args.num_workers > 0)
+        val_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, num_workers=0)
+        val_gen = iter(val_loader)
+        val_batches = [next(val_gen)["image_seq"][:8] for _ in range(2)]
+        val_x = torch.cat(val_batches, dim=0)
 
     model = ConvVAE(latent_dim=args.latent_dim).to(args.device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
@@ -140,8 +152,14 @@ def main():
     running_loss, running_count = 0.0, 0
     done = False
     while not done:
-        for batch in loader:
+        if args.fast:
+            x, _ = sampler.sample(args.batch_size)       # 已在显存
+        else:
+            batch = next(iter(loader))
             x = batch["image_seq"].to(args.device, non_blocking=True)
+        if x is None:
+            break
+        if True:
             b, t, c, h, w = x.shape
             flat = x.reshape(b * t, c, h, w)
             lr = lr_at_step(step, args.lr, args.warmup_steps, args.max_steps)
@@ -184,7 +202,16 @@ def main():
                 print(f"[AE] 可视化已保存: {path}", flush=True)
 
             if args.eval_interval > 0 and step % args.eval_interval == 0:
-                val_loss = run_eval(model, val_loader, args.device)
+                if args.fast:
+                    model.eval()
+                    with torch.no_grad():
+                        ex = sampler.sample(min(32, args.batch_size))[0]
+                        B, T = ex.shape[:2]
+                        val_loss = float(F.mse_loss(model(ex.reshape(B*T, 3, args.image_size, args.image_size))["recon"],
+                                                    ex.reshape(B*T, 3, args.image_size, args.image_size)))
+                    model.train()
+                else:
+                    val_loss = run_eval(model, val_loader, args.device)
                 writer.add_scalar("eval/mse", val_loss, step)
                 print(f"[AE] step {step}  eval_mse={val_loss:.5f}", flush=True)
 
