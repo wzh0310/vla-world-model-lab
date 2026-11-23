@@ -6,10 +6,16 @@
       h_t = GRU(h_{t-1}, [z_{t-1}, a_{t-1}])           # 确定性隐藏态
       post_params = MLP(h_t, embed_t) -> (mu, logvar)  # 后验 q(z_t | h_t, x_t)
       z_t = tanh(mu + eps*sigma)                        # 随机隐状态 (tanh 限制范围)
-    imagine_step(state, action)            : 无真实图像，纯动力学先验预测
+    imagine_step(state, action)            : 无真实图像，纯动力学先验预测一步
       h' = GRU(h, [z, a])                               # 复用同一个 GRU
       prior_params = MLP(h') -> (mu, logvar)            # 先验 p(z' | h')
       z' = tanh(mu + eps*sigma)
+    imagine_rollout(state, actions)        : 开环多步想象（本阶段新增）
+      从初始状态出发，仅用动作序列自回归展开 N 步，全程不观测真实图像。
+      与 observe 的 teacher-forcing 不同，误差会随步长累积，是"世界模型内
+      想象训练"的核心接口（后续 actor-critic 在想象轨迹上学习）。
+    decode_rollout(states, decoder)        : 批量解码想象状态序列为图像序列
+      把 N 步特征一次性送入 decoder，返回 (N, B, C, H, W) 预测视频帧。
     get_feature()                          : 拼接确定性态 + 随机态 -> decoder / reward head
 
 设计要点：
@@ -116,16 +122,83 @@ class RSSM(nn.Module):
                 "post_mu": post_mu, "post_logvar": post_logvar}
         return new_state, info
 
-    def imagine_step(self, state: RSSMState, action: torch.Tensor) -> Tuple[RSSMState, Dict[str, torch.Tensor]]:
-        """纯动力学先验预测一步（无真实图像，想象 rollout 用）。"""
+    def imagine_step(self, state: RSSMState, action: torch.Tensor,
+                     sample: bool = True) -> Tuple[RSSMState, Dict[str, torch.Tensor]]:
+        """纯动力学先验预测一步（无真实图像，想象 rollout 用）。
+
+        sample=True  从先验高斯重参数化采样（默认，保留随机性）；
+        sample=False 直接用先验均值 tanh(mu)，得到确定性预测，便于复现与调试。
+        """
         det = self._transition(state, action)
         prior_mu, prior_logvar = self.prior(det).chunk(2, dim=-1)
-        stoch = self._sample(prior_mu, prior_logvar, self.min_std)
+        if sample:
+            stoch = self._sample(prior_mu, prior_logvar, self.min_std)
+        else:
+            stoch = torch.tanh(prior_mu)
         return RSSMState(det=det, stoch=stoch), {"prior_mu": prior_mu, "prior_logvar": prior_logvar}
+
+    def imagine_rollout(self, initial_state: RSSMState, actions: torch.Tensor,
+                        sample: bool = True) -> Tuple[list, list]:
+        """开环多步想象：从初始状态 + 动作序列生成 N 步隐状态，全程不接入真实图像。
+
+        这是"世界模型内想象训练"的核心接口：rollout 过程中不调用 observe、
+        不读取任何真实帧嵌入，只反复调用 imagine_step 自回归推进。因此它能生成
+        任意步长的预测轨迹，但误差会随步长累积（区别于 teacher-forcing 单步预测）。
+
+        参数：
+          initial_state: RSSMState，batch=(B,*)；通常由真实首帧编码后的后验状态充当起点。
+          actions: 动作序列，支持两种形状：
+                   (B, N, A) 批次形式，或 (N, A) 单样本形式（B>1 时自动广播到各 batch）。
+                   也接受 (A,) 单步动作。
+          sample: 是否从先验分布采样；False 用先验均值（确定性，便于复现）。
+
+        返回：
+          states: List[RSSMState]，长度 N；第 k 项是预测的第 k+1 步状态。
+          infos:  List[dict]，长度 N；各项含该步先验 mu / logvar。
+        """
+        if not isinstance(actions, torch.Tensor):
+            actions = torch.as_tensor(actions, dtype=torch.float32,
+                                      device=initial_state.det.device)
+        if actions.ndim == 1:
+            actions = actions.reshape(1, 1, -1)     # (A,) -> (1,1,A)
+        elif actions.ndim == 2:
+            actions = actions.unsqueeze(0)          # (N,A) -> (1,N,A)
+        if actions.shape[-1] != self.action_dim:
+            raise ValueError(f"动作维度应为 {self.action_dim}，得到 {actions.shape[-1]}")
+        B = initial_state.det.shape[0]
+        if actions.shape[0] == 1 and B > 1:
+            actions = actions.expand(B, -1, -1)
+        if actions.shape[0] != B:
+            raise ValueError(f"动作 batch={actions.shape[0]} 与状态 batch={B} 不一致")
+        N = actions.shape[1]
+        states, infos = [], []
+        s = initial_state
+        for k in range(N):
+            s, info = self.imagine_step(s, actions[:, k], sample=sample)
+            states.append(s)
+            infos.append(info)
+        return states, infos
 
     def get_feature(self, state: RSSMState) -> torch.Tensor:
         """确定性态 + 随机态拼接 -> decoder / reward head 的输入特征。"""
         return state.features()
+
+    def decode_rollout(self, states: list, decoder: nn.Module) -> torch.Tensor:
+        """批量解码想象状态序列为图像序列（imagine_rollout 的配套解码函数）。
+
+        将 N 步状态的拼接特征一次性送入 decoder，避免逐步解码的 Python 循环开销。
+        decoder 需输出 (N*B, C, H, W) 形式的图像张量（与项目 ConvDecoder 一致）。
+        返回张量形状 (N, B, C, H, W)，第 k 项为第 k+1 步的预测图像。
+        """
+        if len(states) == 0:
+            raise ValueError("states 不能为空")
+        feats = torch.stack([self.get_feature(s) for s in states], dim=0)  # (N,B,F)
+        N, B, F = feats.shape
+        out = decoder(feats.reshape(N * B, F))
+        if out.ndim < 3:
+            raise ValueError("decoder 需输出 (batch, C, H, W) 图像张量，"
+                             f"实际得到 {tuple(out.shape)}")
+        return out.reshape(N, B, *out.shape[-3:])
 
     def count_parameters(self) -> int:
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
@@ -154,4 +227,19 @@ if __name__ == "__main__":
     # 多样性与可复现性检查
     s1b, _ = rssm.observe(s, act, embed)
     assert not torch.equal(s1.stoch, s1b.stoch), "随机采样应产生不同隐状态"
+
+    # 开环多步 rollout：只给动作序列，全程不接真实图像
+    acts_seq = torch.randn(B, 10, ACT)
+    states, infos = rssm.imagine_rollout(s1, acts_seq)
+    assert len(states) == 10 and len(infos) == 10
+    assert all(x.det.shape == (B, 200) and x.stoch.shape == (B, 64) for x in states)
+    assert all(x.stoch.min() >= -1 and x.stoch.max() <= 1 for x in states)
+    fake_dec = nn.Sequential(nn.Linear(feat.shape[-1], 3 * 32 * 32),
+                             nn.Unflatten(1, (3, 32, 32)))
+    imgs = rssm.decode_rollout(states, fake_dec)
+    assert imgs.shape == (10, B, 3, 32, 32), imgs.shape
+    # (N,A) 单样本形式在 B>1 时应广播
+    states2, _ = rssm.imagine_rollout(s1, torch.randn(10, ACT), sample=False)
+    assert len(states2) == 10 and states2[0].det.shape == (B, 200)
+    print(f"开环 rollout: {len(states)} 步, 批量解码图像 {tuple(imgs.shape)}")
     print(f"RSSM_OK  参数量={rssm.count_parameters():,}")
