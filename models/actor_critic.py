@@ -26,7 +26,9 @@ import torch
 import torch.nn as nn
 
 
-LOG_STD_MIN, LOG_STD_MAX = -5.0, 2.0
+# 下限设为 -2（最小标准差≈0.135）：防止策略过早坍缩为确定性，
+# 避免 log_prob 中 1/σ² 因子放大梯度导致想象训练发散。
+LOG_STD_MIN, LOG_STD_MAX = -2.0, 2.0
 
 
 class GaussianActor(nn.Module):

@@ -41,6 +41,8 @@
 | 极简策略网络 `models/policy.py` | ✅ | MLP 隐状态→动作（tanh 限幅），约 10 万参数 |
 | 隐空间随机策略 Actor-Critic `models/actor_critic.py` | ✅ | 高斯 Actor（μ+log_std 重参数化）+ 价值 Critic，严格对齐隐维度，动作映射回真实范围，26 万参数 |
 | 想象策略网络验证 `trainer/verify_actor_critic.py` | ✅ | 随机策略在 10 步纯想象 rollout 正常输出动作，梯度沿奖励链可回传 |
+| 想象轨迹训练 `scripts/train_imagine_policy.py` | ✅ | Dreamer 核心：λ-return + PPO + 熵正则 + Huber 价值损失，冻结世界模型仅更新策略，固定探针选最优；v2 想象回报 -0.04→+0.85 |
+| 真实环境零样本评估 `scripts/eval_imagine_policy.py` | ✅ | mujoco 环境 20 回合；成功率 0%（专家 ACT 基线 30%），sim2real 间隙与长程导航瓶颈诚实记录 |
 | 想象策略训练 Demo `trainer/imagine_policy.py` | ✅ | 世界模型内想象→奖励回报→可微反传更新策略，回报 1.32→2.59 上升 |
 | 达标验证 `scripts/verify_targets.py` | ✅ | 测试集 20 步 SSIM 0.7511≥0.6，奖励 MAE 0.024<0.5，全部达标 |
 | 统一配置 `configs/default.yaml` | ✅ | data / model / training / eval 四段，命令行优先 |
