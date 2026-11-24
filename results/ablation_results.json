@@ -1,0 +1,132 @@
+{
+  "horizon_ablation": [
+    {
+      "horizon": 5,
+      "train": {
+        "epochs": 400,
+        "elapsed_sec": 58.6,
+        "reward_mode": "wm",
+        "horizon": 5,
+        "reward_early": -0.01727,
+        "reward_late": 0.00398,
+        "probe_early": -0.02475,
+        "probe_late": 0.01458,
+        "best_probe_return": 0.01485,
+        "best_epoch": 400,
+        "policy_path": "outputs/abl_h5/imagine_policy.pt"
+      },
+      "real_eval": {
+        "n": 30,
+        "success_rate": 0.0,
+        "mean_reward": -1.5435,
+        "mean_final_dist": 0.1885,
+        "min_final_dist": 0.1387,
+        "mean_steps": 50.0
+      }
+    },
+    {
+      "horizon": 10,
+      "train": {
+        "epochs": 400,
+        "elapsed_sec": 71.9,
+        "reward_mode": "wm",
+        "horizon": 10,
+        "reward_early": 0.00781,
+        "reward_late": 0.21887,
+        "probe_early": -0.037,
+        "probe_late": 0.43297,
+        "best_probe_return": 0.45532,
+        "best_epoch": 400,
+        "policy_path": "outputs/abl_h10/imagine_policy.pt"
+      },
+      "real_eval": {
+        "n": 30,
+        "success_rate": 0.0,
+        "mean_reward": -3.2012,
+        "mean_final_dist": 0.1982,
+        "min_final_dist": 0.1734,
+        "mean_steps": 50.0
+      }
+    },
+    {
+      "horizon": 20,
+      "train": {
+        "epochs": 400,
+        "elapsed_sec": 80.9,
+        "reward_mode": "wm",
+        "horizon": 20,
+        "reward_early": 0.75449,
+        "reward_late": 0.29354,
+        "probe_early": 0.59231,
+        "probe_late": 0.31114,
+        "best_probe_return": 0.78634,
+        "best_epoch": 1,
+        "policy_path": "outputs/abl_h20/imagine_policy.pt"
+      },
+      "real_eval": {
+        "n": 30,
+        "success_rate": 0.0,
+        "mean_reward": -3.1303,
+        "mean_final_dist": 0.1982,
+        "min_final_dist": 0.1734,
+        "mean_steps": 50.0
+      }
+    }
+  ],
+  "reward_ablation": {
+    "with_reward": {
+      "train": {
+        "epochs": 400,
+        "elapsed_sec": 71.9,
+        "reward_mode": "wm",
+        "horizon": 10,
+        "reward_early": 0.00781,
+        "reward_late": 0.21887,
+        "probe_early": -0.037,
+        "probe_late": 0.43297,
+        "best_probe_return": 0.45532,
+        "best_epoch": 400,
+        "policy_path": "outputs/abl_h10/imagine_policy.pt"
+      },
+      "real_eval": {
+        "n": 30,
+        "success_rate": 0.0,
+        "mean_reward": -3.2012,
+        "mean_final_dist": 0.1982,
+        "min_final_dist": 0.1734,
+        "mean_steps": 50.0
+      }
+    },
+    "no_reward": {
+      "train": {
+        "epochs": 400,
+        "elapsed_sec": 65.4,
+        "reward_mode": "zero",
+        "horizon": 10,
+        "reward_early": 0.0,
+        "reward_late": 0.0,
+        "probe_early": -0.03713,
+        "probe_late": 0.15299,
+        "best_probe_return": 0.15923,
+        "best_epoch": 360,
+        "policy_path": "outputs/abl_norew/imagine_policy.pt"
+      },
+      "real_eval": {
+        "n": 30,
+        "success_rate": 0.0,
+        "mean_reward": -2.4871,
+        "mean_final_dist": 0.1982,
+        "min_final_dist": 0.1734,
+        "mean_steps": 50.0
+      }
+    }
+  },
+  "generalization": {
+    "n": 50,
+    "success_rate": 0.0,
+    "mean_reward": -2.4926,
+    "mean_final_dist": 0.1973,
+    "min_final_dist": 0.1314,
+    "mean_steps": 50.0
+  }
+}

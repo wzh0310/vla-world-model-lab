@@ -1,0 +1,57 @@
+{
+  "metric_used_for_saving": "success_rate (only meaningful if non-saturated)",
+  "performance_saturated_at_zero": true,
+  "ppo_full_data_dist": 0.2,
+  "ppo_full_data_reward": -2.4887,
+  "ppo_full_data_success": 0.0,
+  "wm_full_data_dist": 0.2,
+  "wm_full_data_reward": -3.5819,
+  "wm_full_data_success": 0.0,
+  "sample_saving_factor": null,
+  "saving_basis": null,
+  "note": "样本节省倍数仅在两组真实成功率非饱和时有统计意义。本实验中纯视觉 PPO 与世界模型想象策略在真实环境成功率均为 0%（性能饱和在失败水平），故样本节省倍数判定为 None——不能把失败水平之间的连续指标差异包装成样本效率优势。曲线的价值在于揭示：PPO 训练后期策略坍缩（600k 步奖励-0.52/距离0.09 反而优于 2000k 步的 -2.49/0.20），世界模型在想象世界内有清晰学习曲线（探针回报随数据/训练提升），但 sim-to-real 间隙仍导致真实环境零样本迁移失败。",
+  "all_series": {
+    "data_pct": [
+      10,
+      30,
+      50,
+      100
+    ],
+    "ppo_reward": [
+      -1.4824,
+      -0.5175,
+      -1.4824,
+      -2.4887
+    ],
+    "wm_reward": [
+      -3.6187,
+      -1.5336,
+      -3.5973,
+      -3.5819
+    ],
+    "ppo_dist": [
+      0.1885,
+      0.0933,
+      0.1885,
+      0.2
+    ],
+    "wm_dist": [
+      0.2,
+      0.1922,
+      0.2,
+      0.2
+    ],
+    "ppo_success": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "wm_success": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  }
+}

@@ -43,6 +43,10 @@
 | 想象策略网络验证 `trainer/verify_actor_critic.py` | ✅ | 随机策略在 10 步纯想象 rollout 正常输出动作，梯度沿奖励链可回传 |
 | 想象轨迹训练 `scripts/train_imagine_policy.py` | ✅ | Dreamer 核心：λ-return + PPO + 熵正则 + Huber 价值损失，冻结世界模型仅更新策略，固定探针选最优；v2 想象回报 -0.04→+0.85 |
 | 真实环境零样本评估 `scripts/eval_imagine_policy.py` | ✅ | mujoco 环境 20 回合；成功率 0%（专家 ACT 基线 30%），sim2real 间隙与长程导航瓶颈诚实记录 |
+| 样本效率对比 `scripts/eval_unified_sfe.py` | ✅ | 纯视觉 PPO vs 世界模型在 10/30/50/100% 数据下统一评估（8 档×30 回合）；两组真实成功率均 0%（饱和），诚实地将样本节省判定为无统计意义，PPO 训练后期坍缩现象入图 |
+| 想象步长消融 `scripts/train_imagine_ablation.py` | ✅ | H=5/10/20 对照；中等步长(H=10)探针回报最优(0.43)，H=20 因复合误差早期峰值后退化 |
+| 奖励预测器消融 `scripts/train_imagine_ablation.py` | ✅ | 有/无奖励头对照（探针统一裁判）；有奖励 0.43 vs 无奖励 0.15，验证奖励头必要性 |
+| 泛化测试 `scripts/eval_ablation.py` | ✅ | 50 个未见场景（起点/目标/视觉变化），与 DT/IQL/PPO 既有基准同口径对比 |
 | 想象策略训练 Demo `trainer/imagine_policy.py` | ✅ | 世界模型内想象→奖励回报→可微反传更新策略，回报 1.32→2.59 上升 |
 | 达标验证 `scripts/verify_targets.py` | ✅ | 测试集 20 步 SSIM 0.7511≥0.6，奖励 MAE 0.024<0.5，全部达标 |
 | 统一配置 `configs/default.yaml` | ✅ | data / model / training / eval 四段，命令行优先 |

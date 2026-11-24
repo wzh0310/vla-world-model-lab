@@ -1,0 +1,90 @@
+[
+  {
+    "episodes": 30,
+    "success_rate": 0.0,
+    "mean_reward": -1.4824,
+    "std_reward": 0.0,
+    "mean_final_dist": 0.1885,
+    "min_final_dist": 0.1885,
+    "group": "ppo",
+    "label": "PPO-vision-200k",
+    "data_level": 200000
+  },
+  {
+    "episodes": 30,
+    "success_rate": 0.0,
+    "mean_reward": -0.5175,
+    "std_reward": 0.0,
+    "mean_final_dist": 0.0933,
+    "min_final_dist": 0.0933,
+    "group": "ppo",
+    "label": "PPO-vision-600k",
+    "data_level": 600000
+  },
+  {
+    "episodes": 30,
+    "success_rate": 0.0,
+    "mean_reward": -1.4824,
+    "std_reward": 0.0,
+    "mean_final_dist": 0.1885,
+    "min_final_dist": 0.1885,
+    "group": "ppo",
+    "label": "PPO-vision-1000k",
+    "data_level": 1000000
+  },
+  {
+    "episodes": 30,
+    "success_rate": 0.0,
+    "mean_reward": -2.4887,
+    "std_reward": 0.0,
+    "mean_final_dist": 0.2,
+    "min_final_dist": 0.2,
+    "group": "ppo",
+    "label": "PPO-vision-2000k",
+    "data_level": 2000000
+  },
+  {
+    "episodes": 30,
+    "success_rate": 0.0,
+    "mean_reward": -3.6187,
+    "std_reward": 0.0009,
+    "mean_final_dist": 0.2,
+    "min_final_dist": 0.2,
+    "group": "wm",
+    "label": "WorldModel-imagine-10%",
+    "data_level": 10
+  },
+  {
+    "episodes": 30,
+    "success_rate": 0.0,
+    "mean_reward": -1.5336,
+    "std_reward": 0.0449,
+    "mean_final_dist": 0.1922,
+    "min_final_dist": 0.1881,
+    "group": "wm",
+    "label": "WorldModel-imagine-30%",
+    "data_level": 30
+  },
+  {
+    "episodes": 30,
+    "success_rate": 0.0,
+    "mean_reward": -3.5973,
+    "std_reward": 0.0016,
+    "mean_final_dist": 0.2,
+    "min_final_dist": 0.2,
+    "group": "wm",
+    "label": "WorldModel-imagine-50%",
+    "data_level": 50
+  },
+  {
+    "episodes": 30,
+    "success_rate": 0.0,
+    "mean_reward": -3.5819,
+    "std_reward": 0.0006,
+    "mean_final_dist": 0.2,
+    "min_final_dist": 0.2,
+    "group": "wm",
+    "label": "WorldModel-imagine-100%",
+    "data_level": 100
+  }
+]
