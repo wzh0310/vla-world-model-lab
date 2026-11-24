@@ -13,6 +13,13 @@
 | `psnr_decay_base.png` | 基线模型 20 步开环 PSNR/SSIM 衰减曲线 |
 | `rollout_test_traj0002.gif` / `.png` | `WorldModel.rollout()` 管线验证：前 3 帧热身 + 10 步开环预测（PSNR 32.0→23.2 dB，无崩坏） |
 
+## evaluation/（评估体系图表）
+
+| 文件 | 内容 |
+|---|---|
+| `eval_curves_baseline.png` | 统一评估四联衰减曲线（PSNR/SSIM/感知距离/隐状态漂移） |
+| `kl_anneal_compare.png` | KL 退火 vs 恒定权重的训练 KL 曲线对比 |
+
 ## ablation/（消融实验图表）
 
 | 文件 | 内容 |

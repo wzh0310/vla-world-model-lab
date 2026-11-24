@@ -51,6 +51,8 @@ def parse_args():
     ap.add_argument("--det-dim", type=int, default=200)
     ap.add_argument("--seq-len", type=int, default=20)
     ap.add_argument("--image-size", type=int, default=64, help="图像分辨率(16 的倍数)")
+    ap.add_argument("--kl-warmup", type=int, default=0,
+                    help="KL 权重退火步数：>0 时 kl_scale 从 0.1 线性升至 --kl-scale（防训练初期隐状态坍缩）")
     ap.add_argument("--batch-size", type=int, default=32)
     ap.add_argument("--lr", type=float, default=3e-4)
     ap.add_argument("--weight-decay", type=float, default=1e-5)
@@ -100,7 +102,7 @@ def apply_config(args, argv):
         "lr": t.get("lr"), "weight_decay": t.get("weight_decay"),
         "max_steps": t.get("max_steps"), "warmup_steps": t.get("warmup_steps"),
         "grad_clip": t.get("grad_clip"), "free_bits": t.get("free_bits"),
-        "kl_scale": t.get("kl_scale"), "reward_scale": t.get("reward_scale"),
+        "kl_scale": t.get("kl_scale"), "kl_warmup": t.get("kl_warmup"), "reward_scale": t.get("reward_scale"),
         "value_scale": t.get("value_scale"), "gamma": t.get("gamma"),
         "log_interval": t.get("log_interval"), "vis_interval": t.get("vis_interval"),
         "save_interval": t.get("save_interval"),
@@ -167,6 +169,13 @@ class WorldModel(nn.Module):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
 
 
+def kl_scale_at_step(step, target, warmup):
+    """KL 权重退火：前 warmup 步从 0.1 线性升至 target，之后恒定 target。"""
+    if warmup <= 0 or step >= warmup:
+        return target
+    return 0.1 + (target - 0.1) * step / max(1, warmup)
+
+
 def lr_at_step(step, base, warmup, total):
     if step < warmup:
         return base * (step + 1) / max(1, warmup)
@@ -198,7 +207,7 @@ def main():
                        args.ae_ckpt, args.device, image_size=args.image_size).to(args.device)
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     print(f"[WM] 参数量={model.count_parameters():,} 设备={args.device} "
-          f"max_steps={args.max_steps} free_bits={args.free_bits}", flush=True)
+          f"max_steps={args.max_steps} free_bits={args.free_bits} kl_warmup={args.kl_warmup}", flush=True)
 
     start = 0
     if args.resume:
@@ -227,6 +236,7 @@ def main():
         # 价值目标：每步起的折扣回报（归一化尺度，与奖励同源）
         value_target = discounted_returns(rews, args.gamma)   # (B,T)
         lr = lr_at_step(step, args.lr, args.warmup_steps, args.max_steps)
+        kl_scale_now = kl_scale_at_step(step, args.kl_scale, args.kl_warmup)
         for g in opt.param_groups:
             g['lr'] = lr
 
@@ -259,7 +269,7 @@ def main():
         loss_kl = total_kl / T
         loss_rew = total_rew / T
         loss_val = total_val / T
-        loss = (loss_rec + args.kl_scale * loss_kl
+        loss = (loss_rec + kl_scale_now * loss_kl
                 + args.reward_scale * loss_rew + args.value_scale * loss_val)
 
         opt.zero_grad(set_to_none=True)
@@ -276,7 +286,7 @@ def main():
             print(f"[WM] step {step}/{args.max_steps} rec={acc['rec']/n:.5f} "
                   f"kl={acc['kl']/n:.4f} rew={acc['rew']/n:.5f} val={acc['val']/n:.5f} "
                   f"loss={loss.item():.4f} gnorm={grad_norm.item():.3f} "
-                  f"lr={lr:.2e} {time.time()-t0:.0f}s", flush=True)
+                  f"lr={lr:.2e} ks={kl_scale_now:.3f} {time.time()-t0:.0f}s", flush=True)
             writer.add_scalar('loss/recon', acc['rec']/n, step)
             writer.add_scalar('loss/kl', acc['kl']/n, step)
             writer.add_scalar('loss/reward', acc['rew']/n, step)
@@ -284,6 +294,7 @@ def main():
             writer.add_scalar('loss/total', loss.item(), step)
             writer.add_scalar('train/grad_norm', grad_norm.item(), step)
             writer.add_scalar('train/lr', lr, step)
+            writer.add_scalar('train/kl_scale', kl_scale_now, step)
             acc = {'rec': 0.0, 'kl': 0.0, 'rew': 0.0, 'val': 0.0, 'n': 0}
 
         if step % args.vis_interval == 0 or step == args.max_steps:
