@@ -22,7 +22,7 @@ class GPUSequenceSampler:
     """常驻显存的序列采样器，接口对齐 DataLoader 的迭代语义。"""
 
     def __init__(self, hdf5_path, seq_len=20, image_size=64, device="cuda", seed=0,
-                 augment=False, shift_px=2, brightness=0.1):
+                 augment=False, shift_px=2, brightness=0.1, crop_frac=0.08):
         self.seq_len = int(seq_len)
         self.image_size = int(image_size)
         self.device = device
@@ -30,9 +30,10 @@ class GPUSequenceSampler:
         self.augment = bool(augment)
         self.shift_px = float(shift_px)
         self.brightness = float(brightness)
+        self.crop_frac = float(crop_frac)
         if self.augment:
             print(f"[AUG] 图像增强开启: 平移±{self.shift_px}px 亮度±{self.brightness} "
-                  f"(整段序列共享参数)", flush=True)
+                  f"随机裁剪≤{self.crop_frac:.0%} (整段序列共享参数)", flush=True)
         t_load = __import__("time").time()
 
         with h5py.File(hdf5_path, "r") as f:
@@ -69,12 +70,16 @@ class GPUSequenceSampler:
         """对 batch 施加增强：(B,T,3,S,S) -> 同形状，整段共享参数。"""
         B, T, C, H, W = imgs.shape
         dev = imgs.device
-        # 每个序列一组平移（归一化到 [-1,1] 的 grid 位移）
-        tx = torch.empty(B, device=dev).uniform_(-self.shift_px, self.shift_px) / W * 2
-        ty = torch.empty(B, device=dev).uniform_(-self.shift_px, self.shift_px) / H * 2
+        # 每个序列一组随机裁剪(缩放) + 平移，整段共享参数保持时序连贯
+        # 缩放 s∈[1, 1+crop_frac]：放大取中心区域，等效小幅随机裁剪，仍保留立方体绝对位置
+        s = torch.empty(B, device=dev).uniform_(1.0, 1.0 + self.crop_frac)
+        # 平移限制随缩放收紧，避免裁剪后越界读出过多 border 填充
+        max_shift = self.shift_px * (1.0 - (s - 1.0) / max(self.crop_frac, 1e-6) * 0.5)
+        tx = torch.empty(B, device=dev).uniform_(-1, 1) * max_shift / W * 2
+        ty = torch.empty(B, device=dev).uniform_(-1, 1) * max_shift / H * 2
         theta = torch.zeros(B, 2, 3, device=dev)
-        theta[:, 0, 0] = 1.0
-        theta[:, 1, 1] = 1.0
+        theta[:, 0, 0] = s
+        theta[:, 1, 1] = s
         theta[:, 0, 2] = tx
         theta[:, 1, 2] = ty
         theta_bt = theta.repeat_interleave(T, dim=0)              # (B*T,2,3)
@@ -92,20 +97,22 @@ class GPUSequenceSampler:
     def __len__(self):
         return len(self.index)
 
-    def sample(self, batch_size, with_rewards=False):
+    def sample(self, batch_size, with_rewards=False, seq_len=None):
         """随机取一个 batch（有放回），返回图像 (B,T,3,S,S) + 动作 (B,T,4)。
 
         with_rewards=True 时额外返回归一化奖励 (B,T,1)，供世界模型奖励头训练。
         默认 False 保持与 AE 训练脚本的两元组接口兼容。
+        seq_len: 课程学习用，可临时截取前 seq_len 步（须 ≤ 采样器构造时的 seq_len）。
         """
+        L = self.seq_len if seq_len is None else min(int(seq_len), self.seq_len)
         sel = self.index[self.rng.integers(0, len(self.index), size=batch_size)]
         imgs, acts, rews = [], [], []
         for tid, s in sel:
             t, s = int(tid), int(s)
-            imgs.append(self.images[t][s:s + self.seq_len].float())
-            acts.append(self.actions[t][s:s + self.seq_len])
+            imgs.append(self.images[t][s:s + L].float())
+            acts.append(self.actions[t][s:s + L])
             if with_rewards:
-                rews.append(self.rewards[t][s:s + self.seq_len])
+                rews.append(self.rewards[t][s:s + L])
         img_batch = torch.stack(imgs, 0)
         if self.augment:
             img_batch = self._augment_batch(img_batch)

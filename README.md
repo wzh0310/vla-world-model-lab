@@ -18,6 +18,10 @@
 | 模块 | 状态 | 说明 |
 |---|---|---|
 | 离线轨迹数据底座 | ✅ | 100 条轨迹（40 专家 + 60 随机），HDF5，约 70MB，不入 git |
+| 混合策略数据扩充 `scripts/collect_mixed_trajectories.py` | ✅ | PPO + 随机策略采集 100 条/5000 帧，初始位置/幅度多样化 |
+| 标准化格式化与 9:1 划分 `scripts/format_dataset.py` | ✅ | (obs,action,reward,next_obs,done) 标准格式，train/test 无泄漏 |
+| 轻量图像增强（平移+亮度+随机裁剪） | ✅ | 整段序列共享参数；扩充数据集上验证有效，全量训练开启 |
+| 全量训练 `scripts/train_full.sh` | ✅ | 分组学习率(enc 1e-4/dyn 3e-4) + 序列长度 10→20 课程 + 每 1000 步评估存最优 |
 | 序列数据集 `datasets/episodic_dataset.py` | ✅ | 20 步序列 / 64×64 / 动作与奖励归一化 |
 | GPU 显存预加载采样 `datasets/fast_loader.py` | ✅ | 约 80× 加速（1000 步从 ~70min → 51s） |
 | 视觉自编码器 `models/vae.py` | ✅ | ConvEncoder/ConvDecoder，64 维隐变量 |
@@ -33,7 +37,7 @@
 | 多步长全面评估 `trainer/eval_multistep_full.py` | ✅ | 1/5/10/20 步 PSNR 衰减 + 各步长奖励误差 + 折线图 + 3 组轨迹视频 |
 | 极简策略网络 `models/policy.py` | ✅ | MLP 隐状态→动作（tanh 限幅），约 10 万参数 |
 | 想象策略训练 Demo `trainer/imagine_policy.py` | ✅ | 世界模型内想象→奖励回报→可微反传更新策略，回报 1.32→2.59 上升 |
-| 图像增强（可选，`--augment`） | ⚠️ | 已实现但实测损害定位精度，默认关闭 |
+| 达标验证 `scripts/verify_targets.py` | ✅ | 测试集 20 步 SSIM 0.7511≥0.6，奖励 MAE 0.024<0.5，全部达标 |
 | 统一配置 `configs/default.yaml` | ✅ | data / model / training / eval 四段，命令行优先 |
 | 消融实验（stoch 维度 + KL 有无） | ✅ | 4 组对照，1/5/10/20 步评估，表格+折线图+稳定性柱状图 |
 | 一键推理 `trainer/infer_video.py` | ✅ | 动作序列 → 开环预测视频（轨迹/JSON/随机三种来源） |
@@ -204,8 +208,22 @@ SSIM 0.92 → 0.84；奖励预测全程 MAE < 0.007（归一化尺度）。衰�
 | `demos/ablation/psnr_by_dim.png` | 维度消融 PSNR 曲线（stoch32 全程最优） |
 | `demos/ablation/psnr_by_kl.png` | KL 消融曲线（无 KL 从第 1 步即崩塌） |
 | `demos/ablation/stability_bar.png` | 长程稳定性柱状图 |
+| `demos/evaluation/training_curves_full.png` | 全量训练监控：三条核心损失 + 周期性 SSIM@20 达标曲线 |
 
 单步口径 GIF（`outputs/wm_fb02/vis/`）不入 git，可用 `trainer/make_prediction_gif.py` 重新生成。
+
+### 4.5 数据扩充与全量调参成果（详情见 `docs/数据扩充与全量调参报告.md`）
+
+混合策略采集 + 标准化格式化后，训练集扩至 200 条 / 8324 帧（原 100 条 / 3324 帧），
+立方体初始位置跨度从 0.06m 扩大到 0.23m。采用分组学习率 + 序列长度课程 + 轻量增强
+全量训练 5000 步（约 8 分钟），周期性开环评估 SSIM 稳步提升：
+
+| 训练步数 | 1000 | 2000 | 3000 | 4000 | 5000 |
+|---|---|---|---|---|---|
+| 20 步开环 SSIM | 0.560 | 0.668 | 0.706 | 0.711 | **0.725** |
+
+测试集 15 条轨迹独立验证：**20 步 SSIM=0.7511（目标≥0.6）**、奖励 MAE=0.024（目标<0.5），
+两项达标目标均大幅通过。重建损失 0.33→0.0093，KL 稳定 0.05 无坍缩。
 
 ---
 
@@ -291,6 +309,22 @@ $VLA trainer/imagine_policy.py --ckpt outputs/wm_tune1/checkpoints/wm_step004000
 
 # 16) 想象策略训练（价值头 baseline 版，Dreamer critic 降方差）
 $VLA trainer/imagine_policy.py --iters 300 --fixed-init --baseline
+
+# 17) 混合策略数据扩充（需 mujoco 环境，EGL 离屏渲染，约 13 分钟）
+/opt/miniconda3/envs/mujoco/bin/python scripts/collect_mixed_trajectories.py \
+    --out outputs/data/mixed_raw.h5 --n-ppo 50 --n-random 50 --max-steps 50
+
+# 18) 标准化格式化 + 9:1 划分 + 数据质量自检
+$VLA scripts/format_dataset.py --raw outputs/data/mixed_raw.h5 \
+    --extra outputs/data/trajectories.h5 --out-dir outputs/data/wm_dataset
+$VLA scripts/verify_dataset.py
+
+# 19) 全量训练（分组学习率 + 课程 + 增强 + 周期性评估存最优，约 8 分钟）
+bash scripts/train_full.sh
+
+# 20) 达标验证 + 训练曲线图
+$VLA scripts/verify_targets.py --ckpt outputs/wm_mixtrain/checkpoints/wm_best.pt
+$VLA scripts/plot_training_curves.py
 ```
 
 `--config` 只填充命令行未显式给出的参数，显式参数始终优先，例如：
@@ -318,7 +352,8 @@ $VLA trainer/train_world_model.py --config configs/default.yaml --max-steps 5000
    但专家动作的想象回报(0.48)反而低于随机策略(1.69)——奖励头在后验特征上训练、想象用先验特征
    有分布偏移，策略学会了利用奖励头偏好。**"想象回报上升"不等于"真实性能上升"**。下一步需
    λ-return + 价值引导 + 策略蒸馏 + 真实环境定期评估。详见 `docs/想象策略训练Demo说明.md`。
-6. 当前为全量训练、未做轨迹级 held-out 划分，指标反映重建 / 预测保真度，非严格泛化能力。
+6. 已做轨迹级 9:1 held-out 划分（train/test 无重叠），但测试轨迹与训练轨迹同分布（同一任务/场景），
+   指标反映同分布重建 / 预测保真度，跨场景（新目标位置/新光照）泛化能力未单独验证。
 
 ---
 

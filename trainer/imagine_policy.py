@@ -45,7 +45,7 @@ def parse_args():
     ap.add_argument("--ae-ckpt", default=os.path.join(ROOT, "outputs/checkpoints/ae_best.pt"))
     ap.add_argument("--out-dir", default=os.path.join(ROOT, "outputs/imagine_policy"))
     ap.add_argument("--trajs", default="traj_0002,traj_0007,traj_0011,traj_0015,traj_0020,traj_0001,traj_0005")
-    ap.add_argument("--horizon", type=int, default=15, help="想象步数（Day11 结论：10~16 步）")
+    ap.add_argument("--horizon", type=int, default=15, help="想象步数（多步评估结论：10~16 步）")
     ap.add_argument("--gamma", type=float, default=0.99)
     ap.add_argument("--iters", type=int, default=300)
     ap.add_argument("--batch-size", type=int, default=16)

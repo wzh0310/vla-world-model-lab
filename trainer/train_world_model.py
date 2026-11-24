@@ -54,7 +54,19 @@ def parse_args():
     ap.add_argument("--kl-warmup", type=int, default=0,
                     help="KL 权重退火步数：>0 时 kl_scale 从 0.1 线性升至 --kl-scale（防训练初期隐状态坍缩）")
     ap.add_argument("--batch-size", type=int, default=32)
-    ap.add_argument("--lr", type=float, default=3e-4)
+    ap.add_argument("--lr", type=float, default=3e-4, help="统一学习率（分组关闭时的后备值）")
+    ap.add_argument("--lr-enc", type=float, default=1e-4, help="编码器+解码器学习率（默认 1e-4）")
+    ap.add_argument("--lr-dyn", type=float, default=3e-4, help="RSSM+奖励头+价值头学习率（默认 3e-4）")
+    ap.add_argument("--group-lr", action="store_true", help="启用分组学习率（enc 1e-4 / dyn 3e-4）")
+    ap.add_argument("--seq-len-start", type=int, default=10,
+                    help="课程学习起始序列长度（默认 10，线性增长到 --seq-len=20）")
+    ap.add_argument("--curriculum-steps", type=int, default=1000,
+                    help="序列长度从 start 线性增到全长所需的步数；0 表示关闭课程")
+    ap.add_argument("--eval-interval", type=int, default=1000,
+                    help="每多少步在验证集上评估一次并保存最优权重；0 关闭")
+    ap.add_argument("--eval-data", default=None,
+                    help="验证集 HDF5（ws_dataset/test.h5）；缺省则复用训练数据同轨迹")
+    ap.add_argument("--eval-trajs", type=int, default=6, help="评估用轨迹数")
     ap.add_argument("--weight-decay", type=float, default=1e-5)
     ap.add_argument("--max-steps", type=int, default=3000)
     ap.add_argument("--warmup-steps", type=int, default=100)
@@ -67,6 +79,7 @@ def parse_args():
     ap.add_argument("--augment", action="store_true", help="开启图像增强（小幅平移+亮度扰动）")
     ap.add_argument("--shift-px", type=float, default=2.0, help="增强平移幅度(像素)")
     ap.add_argument("--brightness", type=float, default=0.1, help="增强亮度扰动幅度")
+    ap.add_argument("--crop-frac", type=float, default=0.08, help="增强随机裁剪幅度(比例)")
     ap.add_argument("--log-interval", type=int, default=50)
     ap.add_argument("--vis-interval", type=int, default=500)
     ap.add_argument("--save-interval", type=int, default=1000)
@@ -183,6 +196,57 @@ def lr_at_step(step, base, warmup, total):
     return base * 0.5 * (1.0 + math.cos(math.pi * min(1.0, p)))
 
 
+def curriculum_len(step, start_len, full_len, ramp_steps):
+    """课程学习：前 ramp_steps 步把序列长度从 start_len 线性增到 full_len。"""
+    if ramp_steps <= 0 or step >= ramp_steps:
+        return full_len
+    return max(2, int(round(start_len + (full_len - start_len) * step / ramp_steps)))
+
+
+@torch.no_grad()
+def evaluate_openloop(model, eval_sampler, image_size, steps=20, n_traj=6,
+                      device="cuda", seed=1234):
+    """在验证集上跑开环 20 步预测，返回 (ssim_last20, reward_mae, psnr_last20)。
+
+    口径与 scripts/eval_world_model.py 一致：首帧后验作起点 + 真实动作开环想象，
+    PSNR/SSIM 用全部 n_traj×steps 步平均，reward_mae 为归一化尺度 MAE。
+    """
+    from trainer.metrics import psnr_metric, ssim_metric
+    model.eval()
+    rng = np.random.default_rng(seed)
+    # 取 n_traj 个互不相同的序列起点
+    n = min(n_traj, len(eval_sampler.index))
+    pick = rng.choice(len(eval_sampler.index), size=n, replace=False)
+    psnrs, ssims, rew_errs = [], [], []
+    for idx in pick:
+        tid, s = eval_sampler.index[idx]
+        tid, s = int(tid), int(s)
+        seq_len = min(steps + 1, len(eval_sampler.images[tid]) - s)
+        imgs = eval_sampler.images[tid][s:s + seq_len].float()      # (L,3,S,S)
+        acts = eval_sampler.actions[tid][s:s + seq_len]             # (L,4)
+        rews = eval_sampler.rewards[tid][s:s + seq_len]             # (L,1)
+        if seq_len < steps + 1:
+            continue
+        # 首帧后验起点
+        emb0, _ = model.encoder(imgs[0:1].unsqueeze(0).reshape(1, 3, image_size, image_size))
+        st = model.rssm.initial_state(1, device=device)
+        st, _ = model.rssm.observe(st, acts[0:1].to(device), emb0.view(1, -1))
+        # 开环想象 steps 步（真实动作 t=1..steps）
+        act_seq = acts[1:steps + 1].unsqueeze(0).to(device)
+        states, _ = model.rssm.imagine_rollout(st, act_seq, sample=False)
+        preds = model.rssm.decode_rollout(states, model.decoder).clamp(-1, 1)[:, 0].cpu()
+        reals = imgs[1:steps + 1].cpu()
+        psnrs.append(psnr_metric(preds, reals).mean())
+        ssims.append(ssim_metric(preds, reals).mean())
+        feat = torch.stack([model.rssm.get_feature(x).reshape(-1) for x in states])
+        pred_r = model.reward_head(feat.to(device)).squeeze(-1).cpu()
+        rew_errs.append((pred_r - rews[1:steps + 1].squeeze(-1).cpu()).abs().mean())
+    model.train()
+    if not ssims:
+        return 0.0, 999.0, 0.0
+    return float(np.mean(ssims)), float(np.mean(rew_errs)), float(np.mean(psnrs))
+
+
 def main():
     args = parse_args()
     torch.manual_seed(args.seed)
@@ -199,15 +263,43 @@ def main():
     sampler = GPUSequenceSampler(args.data, seq_len=args.seq_len, image_size=args.image_size,
                                  device=args.device, seed=args.seed,
                                  augment=args.augment, shift_px=args.shift_px,
-                                 brightness=args.brightness)
+                                 brightness=args.brightness, crop_frac=args.crop_frac)
     print(f"[WM] 采样器: {len(sampler)} 序列, 图像显存 {sampler.mem_mb:.1f}MB, "
           f"加载 {sampler.load_sec:.1f}s", flush=True)
 
     model = WorldModel(args.latent_dim, args.stoch_dim, args.det_dim,
                        args.ae_ckpt, args.device, image_size=args.image_size).to(args.device)
-    opt = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    if args.group_lr:
+        enc_params = list(model.encoder.parameters()) + list(model.decoder.parameters())
+        dyn_params = (list(model.rssm.parameters()) + list(model.reward_head.parameters())
+                      + list(model.value_head.parameters()))
+        opt = torch.optim.AdamW([
+            {"params": enc_params, "lr": args.lr_enc},
+            {"params": dyn_params, "lr": args.lr_dyn},
+        ], weight_decay=args.weight_decay)
+        print(f"[WM] 分组学习率: enc={args.lr_enc} (encoder+decoder) "
+              f"dyn={args.lr_dyn} (RSSM+heads)", flush=True)
+    else:
+        opt = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     print(f"[WM] 参数量={model.count_parameters():,} 设备={args.device} "
           f"max_steps={args.max_steps} free_bits={args.free_bits} kl_warmup={args.kl_warmup}", flush=True)
+
+    # 验证集采样器（不增强），用于周期性开环评估
+    eval_sampler = None
+    if args.eval_interval > 0:
+        eval_path = args.eval_data if args.eval_data else args.data
+        if os.path.isfile(eval_path):
+            eval_sampler = GPUSequenceSampler(eval_path, seq_len=args.seq_len,
+                                              image_size=args.image_size,
+                                              device=args.device, seed=args.seed + 999,
+                                              augment=False)
+            print(f"[WM] 验证集: {eval_path} ({len(eval_sampler)} 序列)", flush=True)
+        else:
+            print(f"[WM] 警告: 验证集 {eval_path} 不存在，周期性评估关闭", flush=True)
+            args.eval_interval = 0
+
+    best_ssim = -1.0
+    best_step = -1
 
     start = 0
     if args.resume:
@@ -231,14 +323,23 @@ def main():
     step = start
     acc = {'rec': 0.0, 'kl': 0.0, 'rew': 0.0, 'val': 0.0, 'n': 0}
     while step < args.max_steps:
-        imgs, acts, rews = sampler.sample(args.batch_size, with_rewards=True)  # (B,T,...)
+        # 课程学习：序列长度从 seq_len_start 线性增到 seq_len
+        cur_len = curriculum_len(step, args.seq_len_start, args.seq_len, args.curriculum_steps)
+        imgs, acts, rews = sampler.sample(args.batch_size, with_rewards=True,
+                                          seq_len=cur_len)  # (B,T,...)
         B, T = imgs.shape[:2]
         # 价值目标：每步起的折扣回报（归一化尺度，与奖励同源）
         value_target = discounted_returns(rews, args.gamma)   # (B,T)
         lr = lr_at_step(step, args.lr, args.warmup_steps, args.max_steps)
         kl_scale_now = kl_scale_at_step(step, args.kl_scale, args.kl_warmup)
-        for g in opt.param_groups:
-            g['lr'] = lr
+        if args.group_lr:
+            lr_e = lr_at_step(step, args.lr_enc, args.warmup_steps, args.max_steps)
+            lr_d = lr_at_step(step, args.lr_dyn, args.warmup_steps, args.max_steps)
+            opt.param_groups[0]['lr'] = lr_e
+            opt.param_groups[1]['lr'] = lr_d
+        else:
+            for g in opt.param_groups:
+                g['lr'] = lr
 
         # 编码所有帧（单步监督：每步都用真实图像）
         flat_x = imgs.reshape(B * T, 3, args.image_size, args.image_size)
@@ -322,8 +423,29 @@ def main():
                         'step': step, 'args': vars(args)}, path)
             print(f"[WM] 检查点: {path}", flush=True)
 
+        # 周期性评估（开环 20 步）+ 保存最优权重
+        if eval_sampler is not None and (step % args.eval_interval == 0 or step == args.max_steps):
+            ev_ssim, ev_rew, ev_psnr = evaluate_openloop(
+                model, eval_sampler, args.image_size, steps=args.seq_len,
+                n_traj=args.eval_trajs, device=args.device)
+            writer.add_scalar('eval/ssim20', ev_ssim, step)
+            writer.add_scalar('eval/reward_mae', ev_rew, step)
+            writer.add_scalar('eval/psnr20', ev_psnr, step)
+            tag = ""
+            if ev_ssim > best_ssim:
+                best_ssim, best_step = ev_ssim, step
+                best_path = os.path.join(ckpt_dir, 'wm_best.pt')
+                torch.save({'model': model.state_dict(), 'optimizer': opt.state_dict(),
+                            'step': step, 'args': vars(args),
+                            'eval': {'ssim20': ev_ssim, 'reward_mae': ev_rew, 'psnr20': ev_psnr}},
+                           best_path)
+                tag = " ★新最优已保存 wm_best.pt"
+            print(f"[EVAL] step {step} 开环{args.seq_len}步: SSIM={ev_ssim:.4f} "
+                  f"PSNR={ev_psnr:.3f}dB reward_MAE={ev_rew:.5f} "
+                  f"(best SSIM={best_ssim:.4f}@{best_step}){tag}", flush=True)
+
     writer.close()
-    print(f"[WM] 训练完成 {time.time()-t0:.0f}s", flush=True)
+    print(f"[WM] 训练完成 {time.time()-t0:.0f}s | 最优 SSIM20={best_ssim:.4f}@{best_step}", flush=True)
 
 
 if __name__ == '__main__':

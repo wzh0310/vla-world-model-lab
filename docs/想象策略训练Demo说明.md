@@ -26,7 +26,7 @@
    标准做法；想象本体不含真实帧，起点用真实帧编码是允许的）。默认每轮重采样起点；
    `--fixed-init` 固定同一批起点以消除起点方差、凸显策略学习信号。
 2. **想象展开**：H=15 步全程在模型内——`policy(feature) → action → rssm.imagine_step`（只调
-   先验，**不接任何真实图像**）`→ reward_head(feature) → r_t`。horizon=15 依据 Day11 评估
+   先验，**不接任何真实图像**）`→ reward_head(feature) → r_t`。horizon=15 依据多步评估结论
    结论（想象宜 10~16 步，避免模糊平衡态失真）。
 3. **回报与更新**：`R = Σ γ^t r_t`（γ=0.99），`loss = -R.mean()`。世界模型参数全部冻结
    （`requires_grad=False`）但**保留在计算图中**——梯度经"奖励 → 隐状态 → 动作 → 策略参数"
