@@ -1,0 +1,7 @@
+{
+  "stoch16": "outputs/abl2_stoch16/checkpoints/wm_best.pt",
+  "stoch32": "outputs/abl2_stoch32/checkpoints/wm_best.pt",
+  "stoch48": "outputs/abl2_stoch48/checkpoints/wm_best.pt",
+  "stoch64": "outputs/abl2_stoch64/checkpoints/wm_best.pt",
+  "mlp": "outputs/abl2_mlp/checkpoints/wm_best.pt"
+}

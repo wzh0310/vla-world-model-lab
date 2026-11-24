@@ -35,8 +35,7 @@ sys.path.insert(0, os.path.join(ROOT, "datasets"))
 sys.path.insert(0, ROOT)
 from fast_loader import GPUSequenceSampler
 from models.vae import ConvEncoder, ConvDecoder
-from models.rssm import RSSM
-from models.heads import RewardHead, ValueHead
+from models.factory import build_dynamics, build_reward_heads
 
 
 def parse_args():
@@ -49,6 +48,8 @@ def parse_args():
     ap.add_argument("--latent-dim", type=int, default=64, help="编码器 embed 与 AE 隐变量维度")
     ap.add_argument("--stoch-dim", type=int, default=64)
     ap.add_argument("--det-dim", type=int, default=200)
+    ap.add_argument("--dynamics", type=str, default="rssm", choices=["rssm", "mlp"],
+                    help="动力学类型：rssm（循环+随机）/ mlp（纯前馈基线，消融对照）")
     ap.add_argument("--seq-len", type=int, default=20)
     ap.add_argument("--image-size", type=int, default=64, help="图像分辨率(16 的倍数)")
     ap.add_argument("--kl-warmup", type=int, default=0,
@@ -111,6 +112,7 @@ def apply_config(args, argv):
         "data": os.path.join(ROOT, d["hdf5_path"]) if d.get("hdf5_path") else args.data,
         "seq_len": d.get("seq_len"), "image_size": d.get("image_size"), "batch_size": d.get("batch_size"), "seed": d.get("seed"),
         "latent_dim": m.get("latent_dim"),
+        "dynamics": m.get("dynamics"),
         "stoch_dim": r.get("stoch_dim"), "det_dim": r.get("det_dim"),
         "lr": t.get("lr"), "weight_decay": t.get("weight_decay"),
         "max_steps": t.get("max_steps"), "warmup_steps": t.get("warmup_steps"),
@@ -154,18 +156,23 @@ def discounted_returns(rewards, gamma):
 
 
 class WorldModel(nn.Module):
-    """编码器(复用AE) + RSSM + 解码器(264->图像) + 奖励头 + 价值头。"""
+    """编码器(复用AE) + 动力学(RSSM 或 MLP 基线) + 解码器 + 奖励头 + 价值头。
 
-    def __init__(self, latent_dim, stoch_dim, det_dim, ae_ckpt, device, image_size=64):
+    dynamics 参数由模型工厂构建，属性名统一为 self.rssm，使训练/评估/推理
+    对两种动力学使用完全相同的调用路径（消融时仅改一行配置）。
+    """
+
+    def __init__(self, latent_dim, stoch_dim, det_dim, ae_ckpt, device, image_size=64,
+                 dynamics="rssm"):
         super().__init__()
         self.encoder = ConvEncoder(latent_dim=latent_dim)
         feat_dim = det_dim + stoch_dim
         self.decoder = ConvDecoder(latent_dim=feat_dim, out_size=image_size)
-        self.rssm = RSSM(stoch_dim=stoch_dim, det_dim=det_dim,
-                         action_dim=4, embed_dim=latent_dim)
+        self.rssm, _ = build_dynamics(dynamics, feat_dim, 4, latent_dim,
+                                      stoch_dim, det_dim)
+        self.dynamics = dynamics
         # 两个头继承 nn.Sequential，权重 key 与旧内联 reward_head 一致（便于兼容历史检查点）
-        self.reward_head = RewardHead(feat_dim)
-        self.value_head = ValueHead(feat_dim)
+        self.reward_head, self.value_head = build_reward_heads(feat_dim)
         # 从 AE 检查点迁移权重：encoder 全部 + decoder 的 deconv 部分
         state = torch.load(ae_ckpt, map_location=device, weights_only=False)
         ae_dim = state.get('latent_dim', latent_dim)
@@ -268,7 +275,8 @@ def main():
           f"加载 {sampler.load_sec:.1f}s", flush=True)
 
     model = WorldModel(args.latent_dim, args.stoch_dim, args.det_dim,
-                       args.ae_ckpt, args.device, image_size=args.image_size).to(args.device)
+                       args.ae_ckpt, args.device, image_size=args.image_size,
+                       dynamics=args.dynamics).to(args.device)
     if args.group_lr:
         enc_params = list(model.encoder.parameters()) + list(model.decoder.parameters())
         dyn_params = (list(model.rssm.parameters()) + list(model.reward_head.parameters())
@@ -402,14 +410,14 @@ def main():
             model.eval()
             with torch.no_grad():
                 vi, va, vr = sampler.sample(8, with_rewards=True)
-                VB = vi.shape[0]
-                ve, _ = model.encoder(vi.reshape(VB*T, 3, args.image_size, args.image_size))
-                ve = ve.view(VB, T, -1)
+                VB, VT = vi.shape[0], vi.shape[1]   # 用采样自身的长度，避免与课程长度 T 不一致
+                ve, _ = model.encoder(vi.reshape(VB*VT, 3, args.image_size, args.image_size))
+                ve = ve.view(VB, VT, -1)
                 st = model.rssm.initial_state(VB, device=args.device)
-                for t in range(T):
+                for t in range(VT):
                     st, _ = model.rssm.observe(st, va[:, t], ve[:, t])
                 vrec = model.decoder(model.rssm.get_feature(st))
-                grid = make_grid(torch.cat([vi[:, T//2], vrec], dim=0),
+                grid = make_grid(torch.cat([vi[:, VT//2], vrec], dim=0),
                                  nrow=8, normalize=True, value_range=(-1, 1), pad_value=0.3)
                 path = os.path.join(vis_dir, f'wm_recon_step{step:06d}.png')
                 save_image(grid, path)

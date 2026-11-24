@@ -32,17 +32,17 @@ if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
 
 from models.vae import ConvEncoder, ConvDecoder
-from models.rssm import RSSM, RSSMState
-from models.heads import RewardHead, ValueHead
+from models.factory import build_dynamics
+from models.reward_predictor import RewardHead, ValueHead
 
 
 class WorldModel:
     """推理态世界模型：encoder + RSSM + decoder + reward_head + value_head。"""
 
-    def __init__(self, encoder: ConvEncoder, decoder: ConvDecoder, rssm: RSSM,
+    def __init__(self, encoder: ConvEncoder, decoder: ConvDecoder, rssm: nn.Module,
                  reward_head: Optional[nn.Module], value_head: Optional[nn.Module],
                  latent_dim: int, stoch_dim: int, det_dim: int, image_size: int,
-                 device: torch.device):
+                 device: torch.device, dynamics: str = "rssm"):
         self.encoder = encoder
         self.decoder = decoder
         self.rssm = rssm
@@ -54,6 +54,7 @@ class WorldModel:
         self.feat_dim = det_dim + stoch_dim
         self.image_size = image_size
         self.device = device
+        self.dynamics = dynamics
         for m in (encoder, decoder, rssm, reward_head, value_head):
             if m is not None:
                 m.eval()
@@ -74,12 +75,13 @@ class WorldModel:
         stoch = int(a.get("stoch_dim", 64))
         det = int(a.get("det_dim", 200))
         image_size = int(a.get("image_size", 64) or 64)
+        dynamics = str(a.get("dynamics", "rssm") or "rssm")
         feat = det + stoch
 
         enc = ConvEncoder(latent_dim=latent).to(device)
         dec = ConvDecoder(latent_dim=feat, out_size=image_size).to(device)
-        rssm = RSSM(stoch_dim=stoch, det_dim=det, action_dim=4,
-                    embed_dim=latent).to(device)
+        rssm, feat = build_dynamics(dynamics, feat, 4, latent, stoch, det)
+        rssm = rssm.to(device)
         rew = RewardHead(feat).to(device)
         val = ValueHead(feat).to(device)
 
@@ -98,9 +100,10 @@ class WorldModel:
         rew = strip("reward_head.", rew)
         val = strip("value_head.", val)
 
-        wm = cls(enc, dec, rssm, rew, val, latent, stoch, det, image_size, device)
+        wm = cls(enc, dec, rssm, rew, val, latent, stoch, det, image_size, device,
+                 dynamics=dynamics)
         wm.ckpt_args = a
-        print(f"[WM] 已加载 {ckpt_path}: latent={latent} stoch={stoch} det={det} "
+        print(f"[WM] 已加载 {ckpt_path}: dynamics={dynamics} latent={latent} stoch={stoch} det={det} "
               f"feat={feat} image={image_size} "
               f"reward_head={'有' if rew is not None else '无'} "
               f"value_head={'有' if val is not None else '无'}", flush=True)

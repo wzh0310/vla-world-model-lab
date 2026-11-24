@@ -24,13 +24,16 @@
 | 全量训练 `scripts/train_full.sh` | ✅ | 分组学习率(enc 1e-4/dyn 3e-4) + 序列长度 10→20 课程 + 每 1000 步评估存最优 |
 | 序列数据集 `datasets/episodic_dataset.py` | ✅ | 20 步序列 / 64×64 / 动作与奖励归一化 |
 | GPU 显存预加载采样 `datasets/fast_loader.py` | ✅ | 约 80× 加速（1000 步从 ~70min → 51s） |
-| 视觉自编码器 `models/vae.py` | ✅ | ConvEncoder/ConvDecoder，64 维隐变量 |
-| RSSM 动力学 `models/rssm.py` | ✅ | 确定性态 200 + 随机态 64，特征 264 维 |
+| 视觉自编码器 `models/vae.py` | ✅ | 兼容转发层；实现已拆分为 encoder.py / decoder.py |
+| 模块化拆分 `models/encoder.py` `decoder.py` `reward_predictor.py` | ✅ | 编码器/解码器/预测头各自独立，权重 key 完全兼容旧检查点 |
+| 模型工厂 `models/factory.py` | ✅ | 按配置构建动力学与预测头，统一 RSSM/MLP 接口 |
+| RSSM 动力学 `models/rssm.py` | ✅ | 确定性态 200 + 随机态可配，特征维度随 stoch 变化 |
+| 纯 MLP 动力学基线 `models/mlp_dynamics.py` | ✅ | 无循环/无随机的前馈对照，用于长程预测动力学消融 |
 | 四损失联合训练 `trainer/train_world_model.py` | ✅ | 重建 + KL(free bits) + 奖励 + 价值，4000 步收敛 |
 | 单步预测全面验证 `trainer/eval_single_step.py` | ✅ | PSNR / SSIM / 奖励 MAE·RMSE，统一评估集 |
 | 预测可视化 `trainer/make_prediction_gif.py` | ✅ | 连续 10 步真实 vs 单步预测对比 GIF |
 | 开环多步预测 `models/rssm.py` `imagine_rollout` | ✅ | 仅首帧+动作，全程不接真实图像，任意步长 |
-| 奖励头 / 价值头 `models/heads.py` | ✅ | 奖励单步回归 + 状态价值（折扣回报监督） |
+| 奖励头 / 价值头 `models/reward_predictor.py`（`heads.py` 兼容转发） | ✅ | 奖励单步回归 + 状态价值（折扣回报监督） |
 | 奖励/价值曲线验证 `trainer/verify_heads.py` | ✅ | 奖励 corr 0.77，价值 corr 0.55（含局限说明） |
 | 多步预测调优（KL 权重） | ✅ | free_bits 0.05+kl_scale 1.5，10步开环 22.39→24.71dB |
 | 多步基准评估 `trainer/eval_multistep.py` | ✅ | 多轨迹逐 step PSNR/SSIM，统一对比口径 |
@@ -45,6 +48,8 @@
 | 统一推理封装 `models/world_model.py`（rollout 管线） | ✅ | 一键加载检查点；前 K 帧后验热身 + 开环想象，同步输出预测图像/隐状态/奖励/价值序列 |
 | 四级评估指标体系 + 统一评估入口 `scripts/eval_world_model.py` | ✅ | 像素/结构/感知/动力学四级指标，一条命令输出全部指标+精度-步长衰减曲线 |
 | KL 权重退火（--kl-warmup）与对照实验 | ✅ | step1 +0.84dB 但长程无收益，确认 free bits 已主导防坍缩（诚实记录） |
+| 多步预测对比可视化 `scripts/compare_video.py` | ✅ | 3 条测试轨迹真实vs预测并排视频，标注 5/10/20 步衰减，入库 results/ |
+| 统一消融评估 `scripts/eval_ablation_unified.py` | ✅ | 同一数据/配置下维度(16/32/48/64) + 动力学(RSSM/MLP)对照，图表指标入 results/ |
 | 完整 DreamerV2 闭环（λ-return + 价值引导 + 策略蒸馏） | ⬜ | 下一阶段目标 |
 
 ---
@@ -61,11 +66,15 @@
     outputs/data/trajectories.h5（图像/动作/奖励，不入 git）
         │ datasets/fast_loader.py：GPU 显存预加载 + 20 步序列采样（约 80× 加速）
         ▼
-【模型层】三段式世界模型（models/）
-    ConvEncoder  64×64×3 → 观测嵌入 e_t (64)
-    RSSM         h_t = GRU([z_{t-1},a_t], h_{t-1})；后验 q(z|h,e) / 先验 p(z|h)
-    ConvDecoder  feature [h,z] (264) → 64×64×3 预测帧
-    RewardHead / ValueHead  feature → 奖励 / 价值
+【模型层】模块化世界模型（models/，已解耦为独立文件）
+    encoder.py           ConvEncoder: 64×64×3 → 观测嵌入 e_t (64)
+    rssm.py              RSSM: h_t = GRU([z_{t-1},a_t], h_{t-1})，后验 q(z|h,e) / 先验 p(z|h)
+    mlp_dynamics.py      MLPDynamics: 纯前馈动力学基线（无循环、无随机），消融对照
+    decoder.py           ConvDecoder: feature [h,z] → 64×64×3 预测帧
+    reward_predictor.py  RewardHead / ValueHead: feature → 奖励 / 价值
+    factory.py           模型工厂：按配置构建动力学与预测头，统一 RSSM/MLP 接口
+    world_model.py       统一推理封装（rollout 管线）
+        │ vae.py / heads.py 为向后兼容的转发层；权重 key 完全不变
         │ trainer/train_world_model.py：重建 + KL(free bits) + 奖励 + 价值 四损失
         ▼
 【评估与想象层】（trainer/）
@@ -225,6 +234,24 @@ SSIM 0.92 → 0.84；奖励预测全程 MAE < 0.007（归一化尺度）。衰�
 测试集 15 条轨迹独立验证：**20 步 SSIM=0.7511（目标≥0.6）**、奖励 MAE=0.024（目标<0.5），
 两项达标目标均大幅通过。重建损失 0.33→0.0093，KL 稳定 0.05 无坍缩。
 
+### 4.6 代码结构化与消融可视化成果（详情见 `docs/消融与可视化报告.md`）
+
+**模块解耦**：世界模型从单一 `vae.py` 拆为 `encoder.py` / `decoder.py` / `rssm.py` /
+`reward_predictor.py` 独立模块，新增 `factory.py` 模型工厂统一构建；`vae.py` / `heads.py`
+保留为兼容转发层，历史检查点权重 key 完全不变（已用 `wm_best.pt` 回归验证无缝加载）。
+超参数由 `configs/default.yaml` 单一来源管理（含新增 `model.dynamics`），消除脚本硬编码。
+
+**预测对比可视化**（`results/visualization/`，3 条测试轨迹）：真实帧 vs 20 步开环预测并排视频，
+逐帧标注 PSNR/SSIM，5/10/20 步关键节点高亮，并附三联对比图与衰减曲线。示例轨迹：
+PSNR 从 1 步约 26dB 衰减到 20 步 19~23dB，直观体现长程误差累积规律。
+
+**统一消融实验**（同一扩充数据 + 同一超参 + 均不开增强，`results/`，详情见 `docs/消融与可视化报告.md`）：
+- 维度消融（stoch 16/32/48/64）：20 步 PSNR 23.14/23.75/23.71/24.00 dB，
+  维度升高精度略好但边际递减（16→64 仅 +0.86dB），32 维长程衰减最小（5.81dB）；
+- 动力学消融：RSSM 20 步 PSNR 23.71dB / SSIM 0.869，纯 MLP 基线仅 17.61dB / 0.398，
+  证明循环确定性态 + 随机隐状态是长程预测能力的关键；
+- 统一评估口径 1/5/10/20 步 PSNR/SSIM/奖励误差，图表与指标表入库 `results/`。
+
 ---
 
 ## 五、训练 / 评估启动方式
@@ -325,6 +352,16 @@ bash scripts/train_full.sh
 # 20) 达标验证 + 训练曲线图
 $VLA scripts/verify_targets.py --ckpt outputs/wm_mixtrain/checkpoints/wm_best.pt
 $VLA scripts/plot_training_curves.py
+
+# 21) 多步预测对比可视化（3 条测试轨迹 → 并排视频 + 5/10/20 步关键节点图）
+$VLA scripts/compare_video.py --out-dir results/visualization
+
+# 22) 统一消融训练（维度 16/32/64 + MLP 基线；基线 stoch48 见步骤 19）
+bash scripts/train_ablation_unified.sh
+
+# 23) 统一消融评估 + 汇总图表（改 results/abl_groups.json 指向各组 wm_best.pt）
+$VLA scripts/eval_ablation_unified.py
+$VLA scripts/plot_ablation_unified.py
 ```
 
 `--config` 只填充命令行未显式给出的参数，显式参数始终优先，例如：

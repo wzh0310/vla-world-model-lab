@@ -26,6 +26,7 @@ data:
 model:
   latent_dim: 64              # ConvEncoder 输出的观测嵌入 / AE 隐变量维度
   hidden_channels: 32         # 卷积通道基数（4 层：32/64/128/256）
+  dynamics: rssm              # 动力学类型：rssm（循环+随机）/ mlp（纯前馈消融基线）
   rssm:
     stoch_dim: 64             # 随机隐状态维度（对角高斯，tanh 限幅）
     det_dim: 200              # GRU 确定性隐藏态维度
