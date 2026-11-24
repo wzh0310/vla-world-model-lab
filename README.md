@@ -39,6 +39,8 @@
 | 多步基准评估 `trainer/eval_multistep.py` | ✅ | 多轨迹逐 step PSNR/SSIM，统一对比口径 |
 | 多步长全面评估 `trainer/eval_multistep_full.py` | ✅ | 1/5/10/20 步 PSNR 衰减 + 各步长奖励误差 + 折线图 + 3 组轨迹视频 |
 | 极简策略网络 `models/policy.py` | ✅ | MLP 隐状态→动作（tanh 限幅），约 10 万参数 |
+| 隐空间随机策略 Actor-Critic `models/actor_critic.py` | ✅ | 高斯 Actor（μ+log_std 重参数化）+ 价值 Critic，严格对齐隐维度，动作映射回真实范围，26 万参数 |
+| 想象策略网络验证 `trainer/verify_actor_critic.py` | ✅ | 随机策略在 10 步纯想象 rollout 正常输出动作，梯度沿奖励链可回传 |
 | 想象策略训练 Demo `trainer/imagine_policy.py` | ✅ | 世界模型内想象→奖励回报→可微反传更新策略，回报 1.32→2.59 上升 |
 | 达标验证 `scripts/verify_targets.py` | ✅ | 测试集 20 步 SSIM 0.7511≥0.6，奖励 MAE 0.024<0.5，全部达标 |
 | 统一配置 `configs/default.yaml` | ✅ | data / model / training / eval 四段，命令行优先 |
