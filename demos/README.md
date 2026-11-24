@@ -11,6 +11,7 @@
 | `infer_traj0002_pred.gif` | 一键推理脚本 `trainer/infer_video.py` 产物：traj_0002 起点 8，20 步预测 |
 | `infer_traj0002_compare.png` | 一键推理静态对比网格 |
 | `psnr_decay_base.png` | 基线模型 20 步开环 PSNR/SSIM 衰减曲线 |
+| `rollout_test_traj0002.gif` / `.png` | `WorldModel.rollout()` 管线验证：前 3 帧热身 + 10 步开环预测（PSNR 32.0→23.2 dB，无崩坏） |
 
 ## ablation/（消融实验图表）
 
