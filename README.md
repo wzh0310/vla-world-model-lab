@@ -208,13 +208,13 @@ SSIM 0.92 → 0.84；奖励预测全程 MAE < 0.007（归一化尺度）。衰�
 
 ## 五、训练 / 评估启动方式
 
-全部命令在容器内 `py312-robot` conda 环境执行（Python 3.12 + torch 2.7.1+cu126，GPU：NVIDIA RTX A6000）。
+全部命令在 `wzh-ai` 容器的 `vla` conda 环境执行（解释器：`/opt/miniconda3/envs/vla/bin/python`，Python 3.12 + torch 2.6.0+cu124，GPU：NVIDIA RTX A6000）。
 
 ### 5.0 快速启动（最小流程，约 15 分钟跑通全链路）
 
 ```bash
 cd /data/wzh/robot/vla-world-model-lab
-VLA=/data/lxt/miniconda3/envs/py312-robot/bin/python
+VLA=/opt/miniconda3/envs/vla/bin/python
 
 # ① 训练视觉自编码器（约 1 分钟，提供 encoder/decoder 初始权重）
 $VLA trainer/train_ae.py --config configs/world_model.yaml --max-steps 1000
@@ -239,7 +239,7 @@ $VLA trainer/infer_video.py --ckpt outputs/wm/checkpoints/wm_step004000.pt     -
 
 ```bash
 cd /data/wzh/robot/vla-world-model-lab
-VLA=/data/lxt/miniconda3/envs/py312-robot/bin/python
+VLA=/opt/miniconda3/envs/vla/bin/python
 
 # 1) 数据自检（可选，确认数据集可用）
 $VLA datasets/episodic_dataset.py --batch-size 8

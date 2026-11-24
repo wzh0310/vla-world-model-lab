@@ -8,7 +8,7 @@ for i in $(seq 1 240); do
     echo "[WATCH] 训练完成，启动评估 $(date)" >> outputs/ablation_watch.log
     bash scripts/ablation_eval.sh >> outputs/ablation_watch.log 2>&1
     echo "[WATCH] 评估完成，启动汇总 $(date)" >> outputs/ablation_watch.log
-    /data/lxt/miniconda3/envs/py312-robot/bin/python trainer/ablation_report.py >> outputs/ablation_watch.log 2>&1
+    /opt/miniconda3/envs/vla/bin/python trainer/ablation_report.py >> outputs/ablation_watch.log 2>&1
     echo "[WATCH] 全部完成 $(date)" >> outputs/ablation_watch.log
     exit 0
   fi

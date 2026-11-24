@@ -3,7 +3,7 @@
 # 在 vla-world-model-lab 根目录运行
 set -e
 cd /data/wzh/robot/vla-world-model-lab
-P=/data/lxt/miniconda3/envs/py312-robot/bin/python
+P=/opt/miniconda3/envs/vla/bin/python
 
 echo "========== 消融 A: 隐状态维度 stoch_dim = 16 =========="
 $P trainer/train_world_model.py --config configs/default.yaml \

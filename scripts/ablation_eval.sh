@@ -2,7 +2,7 @@
 # 消融实验评估编排：统一口径评估 4 组模型的多步预测
 set -e
 cd /data/wzh/robot/vla-world-model-lab
-P=/data/lxt/miniconda3/envs/py312-robot/bin/python
+P=/opt/miniconda3/envs/vla/bin/python
 
 TRAJS="traj_0002,traj_0007,traj_0011,traj_0015,traj_0020"
 STARTS="2,8"
