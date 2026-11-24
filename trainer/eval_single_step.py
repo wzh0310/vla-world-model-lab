@@ -114,6 +114,7 @@ def build_models(args, ckpt):
     latent = int(a.get("latent_dim", 64))
     stoch = int(a.get("stoch_dim", 64))
     det = int(a.get("det_dim", 200))
+    image_size = int(a.get("image_size", 64) or 64)
     feat_dim = det + stoch
 
     # 纯 AE：latent->latent 解码器
@@ -124,7 +125,7 @@ def build_models(args, ckpt):
 
     # 世界模型：encoder + decoder(264->img) + rssm + reward_head
     enc = ConvEncoder(latent_dim=latent).to(args.device)
-    dec = ConvDecoder(latent_dim=feat_dim).to(args.device)
+    dec = ConvDecoder(latent_dim=feat_dim, out_size=image_size).to(args.device)
     rssm = RSSM(stoch_dim=stoch, det_dim=det, action_dim=4,
                 embed_dim=latent).to(args.device)
     head = nn.Sequential(
@@ -139,9 +140,9 @@ def build_models(args, ckpt):
     head.load_state_dict({k[len("reward_head."):]: v for k, v in sd.items() if k.startswith("reward_head.")})
     for m in (enc, dec, rssm, head):
         m.eval()
-    print(f"[EVAL] 模型就绪: latent={latent} stoch={stoch} det={det} feat={feat_dim}", flush=True)
+    print(f"[EVAL] 模型就绪: latent={latent} stoch={stoch} det={det} feat={feat_dim} image={image_size}", flush=True)
     return dict(ae=ae, enc=enc, dec=dec, rssm=rssm, head=head,
-                latent=latent, stoch=stoch, det=det, feat_dim=feat_dim)
+                latent=latent, stoch=stoch, det=det, feat_dim=feat_dim, image_size=image_size)
 
 
 # ---------------------------------------------------------------- 指标函数

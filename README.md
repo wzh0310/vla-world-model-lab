@@ -3,7 +3,12 @@
 具身智能世界模型实验室：从离线交互轨迹学习「图像 + 动作 → 隐状态 → 下一帧图像」的动力学模型，
 为后续 VLA 策略的想象 rollout / 数据增强 / 规划提供基础。**全程在 `vla` conda 环境开发。**
 
-当前阶段：**单步预测世界模型可用** —— 已完成视觉自编码器、RSSM 动力学、三损失联合训练，
+> **项目范围说明**：本项目聚焦**算法层世界模型的实现与验证**——RSSM 动力学建模、
+> 多步开环想象、奖励/价值头与想象策略链路，全部基于 **MuJoCo 仿真环境**（PushCube-v0 推立方体）
+> 的离线轨迹验证；**不涉及底层机器人控制**（电机驱动、实机部署、运动学/动力学求解等均不在范围内）。
+> 真实机器人迁移属于后续工作。
+
+当前阶段：**多步开环想象 + 消融实验完成，世界模型核心链路闭环可用** —— 已完成视觉自编码器、RSSM 动力学、三损失联合训练，
 并在统一评估集上完成 PSNR / SSIM / 奖励误差的量化验证与连续 10 步预测可视化。
 
 ---
@@ -30,11 +35,60 @@
 | 想象策略训练 Demo `trainer/imagine_policy.py` | ✅ | 世界模型内想象→奖励回报→可微反传更新策略，回报 1.32→2.59 上升 |
 | 图像增强（可选，`--augment`） | ⚠️ | 已实现但实测损害定位精度，默认关闭 |
 | 统一配置 `configs/default.yaml` | ✅ | data / model / training / eval 四段，命令行优先 |
+| 消融实验（stoch 维度 + KL 有无） | ✅ | 4 组对照，1/5/10/20 步评估，表格+折线图+稳定性柱状图 |
+| 一键推理 `trainer/infer_video.py` | ✅ | 动作序列 → 开环预测视频（轨迹/JSON/随机三种来源） |
+| 配置支持分辨率/序列长/隐维度可配 | ✅ | VAE 自适应池化+resize 向后兼容改造，64 分辨率权重兼容 |
 | 完整 DreamerV2 闭环（λ-return + 价值引导 + 策略蒸馏） | ⬜ | 下一阶段目标 |
 
 ---
 
-## 二、模型架构
+## 二、项目整体架构与算法原理
+
+### 2.1 端到端数据流（文字版架构图）
+
+```
+【数据层】MuJoCo Panda 仿真 (mujoco-studio-lab)
+    PushCube-v0 推立方体：100 条轨迹（40 专家 scripted + 60 随机），224×224 RGB
+        │ scripts/export_trajectories.py（EGL 离屏渲染）
+        ▼
+    outputs/data/trajectories.h5（图像/动作/奖励，不入 git）
+        │ datasets/fast_loader.py：GPU 显存预加载 + 20 步序列采样（约 80× 加速）
+        ▼
+【模型层】三段式世界模型（models/）
+    ConvEncoder  64×64×3 → 观测嵌入 e_t (64)
+    RSSM         h_t = GRU([z_{t-1},a_t], h_{t-1})；后验 q(z|h,e) / 先验 p(z|h)
+    ConvDecoder  feature [h,z] (264) → 64×64×3 预测帧
+    RewardHead / ValueHead  feature → 奖励 / 价值
+        │ trainer/train_world_model.py：重建 + KL(free bits) + 奖励 + 价值 四损失
+        ▼
+【评估与想象层】（trainer/）
+    eval_single_step      单步三口径 PSNR/SSIM + 奖励误差
+    eval_multistep_full   1/5/10/20 步开环 PSNR 衰减曲线 + 视频
+    imagine_policy        世界模型内想象轨迹 → 可微反传更新策略（Demo）
+    infer_video           一键推理：动作序列 → 预测视频
+        ▼
+【下游衔接】embodied-policy-zoo（BC/ACT/PPO/IQL/DT 策略库）可消费想象数据
+```
+
+### 2.2 核心算法原理（精简版，详见 docs/）
+
+- **为什么要世界模型**：让智能体在"脑内"推演未来——给定当前观测与候选动作序列，
+  不与真实环境交互即可预测后续图像与奖励，用于想象训练、规划与数据增强，
+  将昂贵的真实交互转化为廉价的模型内 rollout。
+- **RSSM（Recurrent State Space Model）**：隐状态拆成两部分——确定性态 `h_t`（GRU，
+  承担记忆与时序连贯）+ 随机态 `z_t`（对角高斯，承担环境不确定性表达）。
+  训练用**后验** `q(z_t|h_t,e_t)`（能看到真实帧，保证重建准确）；想象用**先验**
+  `p(z_t|h_t)`（看不到真实帧，纯动力学递推）；两者用 KL 损失对齐，
+  把后验学到的动力学"蒸馏"进先验——这是开环想象可用性的命脉（消融实验证实）。
+- **free bits**：KL 逐元素下限（当前 0.05 nats）。没有它，训练初期 KL 会被优化到 0
+  （后验≈先验但都学不到东西，"后验坍缩"），梯度消失导致先验预测糊成一团；
+  加 free bits 保证最小信息流。实测 free_bits 1.0→0.2 让单步预测 +5.7 dB。
+- **四损失联合训练**：`L = 重建MSE + 1.5·KL(free bits) + 2.0·奖励MSE + 1.0·价值MSE`，
+  价值目标为 20 步窗口折扣回报（γ=0.99），为后续 Dreamer 式 actor-critic 打基础。
+- **开环想象**：`imagine_rollout` 仅凭首帧后验 + 动作序列自回归展开，全程不接真实图像；
+  误差随步长累积（1 步 27.7dB → 20 步 21.8dB），建议想象 horizon 取 10~16 步。
+
+## 三、模型结构细节
 
 DreamerV2 风格三段式世界模型：
 
@@ -79,13 +133,13 @@ DreamerV2 风格三段式世界模型：
 
 ---
 
-## 三、已验证效果（统一评估集）
+## 四、已验证效果（统一评估集）
 
 评估集：覆盖全部 100 条轨迹，每条均匀取 4 个 20 步窗口，共 **400 序列 × 19 个评分帧**
 （t=1..19 三种口径对齐比较）。图像归一化到 [-1,1]，PSNR 峰值取 2²=4。
 完整数据见 `outputs/wm_fb02/metrics/single_step_eval.json`（输出目录不入 git）。
 
-### 3.1 图像重建 / 预测
+### 4.1 图像重建 / 预测
 
 | 口径 | PSNR (dB) | SSIM |
 |---|---|---|
@@ -104,7 +158,7 @@ KL 梯度为零，先验预测仅 23.38 dB / SSIM 0.734（画面糊）。诊断�
 （**+5.7 dB**），后验-先验差距从 9 dB 缩到 4 dB。这验证了「先验学习压力不足是模糊主因」
 的诊断。诊断工具：`trainer/diag_kl.py`。
 
-### 3.2 奖励预测（原始奖励尺度）
+### 4.2 奖励预测（原始奖励尺度）
 
 | 口径 | MAE | RMSE | bias |
 |---|---|---|---|
@@ -114,22 +168,78 @@ KL 梯度为零，先验预测仅 23.38 dB / SSIM 0.734（画面糊）。诊断�
 样本量 7600。MAE 约 0.15（奖励量级最大 ~10），方向性可用；RMSE 偏高源于少数
 "成功推到目标"的高奖励帧难以精确回归（奖励稀疏、分布长尾）。
 
-### 3.3 可视化
+### 4.3 多步开环预测与消融实验
 
-- `prediction_single_step.gif`：连续 10 步真实帧 vs 单步预测帧逐帧对比动图。
-- `prediction_single_step.png`：2×10 静态对比网格（上排真实、下排预测）。
+详见 `docs/多步长预测全面评估报告.md` 与 `docs/消融实验与工程优化报告.md`。
 
-（以上位于 `outputs/wm_fb02/vis/`，输出目录不入 git，可运行脚本重新生成。）
+**20 步开环衰减（基线 stoch64+KL）**：PSNR 27.69 → 21.75 dB（衰减 5.94），
+SSIM 0.92 → 0.84；奖励预测全程 MAE < 0.007（归一化尺度）。衰减曲线
+`demos/prediction/psnr_decay_base.png`。
+
+**消融实验核心结论**（统一口径 10 条开环 × 20 步）：
+
+| 组别 | PSNR@1 | PSNR@10 | PSNR@20 | 1→20 衰减 |
+|---|---|---|---|---|
+| 基线（KL, stoch64） | 27.69 | 20.97 | 21.75 | 5.94 |
+| stoch32（KL） | **28.26** | **22.72** | 22.31 | 5.94 |
+| stoch16（KL） | 27.17 | 22.18 | **22.33** | **4.85** |
+| 无 KL（stoch64） | 13.60 | 9.70 | 9.39 | 4.21† |
+
+> † 无 KL 组整体崩塌（SSIM≈0.15→0.005，奖励误差 ×12），衰减小是起点就低的假象。
+> 维度存在最优点：stoch32 全程精度最高、stoch16 长程最稳，均优于 stoch64；
+> **KL 是开环想象的命脉，不可移除**。图表：`demos/ablation/psnr_by_dim.png`、
+> `psnr_by_kl.png`、`ssim_compare.png`、`stability_bar.png`。
+
+### 4.4 演示视频与可视化（已入库，可直接查看）
+
+| 素材 | 内容 |
+|---|---|
+| `demos/prediction/real_vs_pred20_traj0002.gif` | **核心演示**：真实 vs 20 步开环预测并排动图（仅首帧+动作，全程不看真实帧） |
+| `demos/prediction/real_vs_pred20_traj0002_grid.png` | 上排真实 / 下排预测静态网格 |
+| `demos/prediction/infer_traj0002_pred.gif` | 一键推理脚本产物：输入动作序列直接生成预测视频 |
+| `demos/prediction/psnr_decay_base.png` | 20 步 PSNR/SSIM 衰减曲线 |
+| `demos/ablation/psnr_by_dim.png` | 维度消融 PSNR 曲线（stoch32 全程最优） |
+| `demos/ablation/psnr_by_kl.png` | KL 消融曲线（无 KL 从第 1 步即崩塌） |
+| `demos/ablation/stability_bar.png` | 长程稳定性柱状图 |
+
+单步口径 GIF（`outputs/wm_fb02/vis/`）不入 git，可用 `trainer/make_prediction_gif.py` 重新生成。
 
 ---
 
-## 四、训练 / 评估启动方式
+## 五、训练 / 评估启动方式
 
-全部命令在容器 `wzh-ai` 的 `vla` 环境执行（解释器：`/opt/miniconda3/envs/vla/bin/python`）。
+全部命令在容器内 `py312-robot` conda 环境执行（Python 3.12 + torch 2.7.1+cu126，GPU：NVIDIA RTX A6000）。
+
+### 5.0 快速启动（最小流程，约 15 分钟跑通全链路）
 
 ```bash
 cd /data/wzh/robot/vla-world-model-lab
-VLA=/opt/miniconda3/envs/vla/bin/python
+VLA=/data/lxt/miniconda3/envs/py312-robot/bin/python
+
+# ① 训练视觉自编码器（约 1 分钟，提供 encoder/decoder 初始权重）
+$VLA trainer/train_ae.py --config configs/world_model.yaml --max-steps 1000
+
+# ② 世界模型四损失联合训练（GPU 约 7 分钟）
+$VLA trainer/train_world_model.py --config configs/default.yaml --output-dir outputs/wm
+
+# ③ 20 步开环预测全面评估（PSNR 衰减 + 曲线 + 对比视频）
+$VLA trainer/eval_multistep_full.py --ckpt outputs/wm/checkpoints/wm_step004000.pt --out-dir outputs/wm
+
+# ④ 一键推理：输入动作序列，直接生成预测视频
+$VLA trainer/infer_video.py --ckpt outputs/wm/checkpoints/wm_step004000.pt     --traj traj_0002 --start 8 --steps 20 --out outputs/infer_demo
+
+# ⑤ 查看结果：outputs/wm/vis/*.gif、psnr_decay.png、outputs/infer_demo/*
+```
+
+> 前置依赖：`outputs/data/trajectories.h5`（100 条轨迹）与 `outputs/checkpoints/ae_best.pt`。
+> 数据由 `mujoco-studio-lab` 仓库的 `scripts/export_trajectories.py` 导出（MuJoCo EGL 离屏渲染）。
+
+### 5.1 完整实验命令流水线（复现全部实验）
+
+
+```bash
+cd /data/wzh/robot/vla-world-model-lab
+VLA=/data/lxt/miniconda3/envs/py312-robot/bin/python
 
 # 1) 数据自检（可选，确认数据集可用）
 $VLA datasets/episodic_dataset.py --batch-size 8
@@ -190,7 +300,7 @@ $VLA trainer/train_world_model.py --config configs/default.yaml --max-steps 5000
 
 ---
 
-## 五、已知限制与下一步
+## 六、已知限制与下一步
 
 1. **先验与后验仍有约 4 dB 差距**：free bits 从 1.0 降到 0.2 后先验预测从 23.38 提升到
    29.08 dB（已解决"糊"的主要问题），但纯动力学预测仍比看到真值的后验重建略模糊。
@@ -209,7 +319,7 @@ $VLA trainer/train_world_model.py --config configs/default.yaml --max-steps 5000
 
 ---
 
-## 六、目录结构
+## 七、目录结构
 
 ```
 vla-world-model-lab/
