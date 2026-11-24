@@ -97,6 +97,8 @@ def main():
     panel = 176
     bar = 26
     summary = {}
+    # 关键节点随 --steps 自适应：短步长预测时退化为最后一步，避免索引越界。
+    key_steps = [k for k in KEY_STEPS if k <= args.steps] or [args.steps]
 
     for key in [t.strip() for t in args.trajs.split(",") if t.strip()]:
         imgs, acts = load_traj(args.data, key, S, args.device)
@@ -118,7 +120,7 @@ def main():
         frames = []
         for k in range(args.steps):
             step_no = k + 1
-            is_key = step_no in KEY_STEPS
+            is_key = step_no in key_steps
             bg = (60, 44, 12) if is_key else (30, 30, 36)
             canvas = Image.new("RGB", (panel * 2 + 14, panel + bar + (16 if is_key else 0)), bg)
             d = ImageDraw.Draw(canvas)
@@ -134,8 +136,8 @@ def main():
         frames[0].save(gif_path, save_all=True, append_images=frames[1:],
                        duration=280, loop=0, disposal=2)
 
-        # ---- 5/10/20 关键节点三联图：真实 | 预测 | 绝对误差热图 ----
-        kp = [k - 1 for k in KEY_STEPS if k <= args.steps]
+        # ---- 关键节点三联图：真实 | 预测 | 绝对误差热图 ----
+        kp = [k - 1 for k in key_steps]
         fig, axes = plt.subplots(len(kp), 3, figsize=(10, 3.1 * len(kp)))
         if len(kp) == 1:
             axes = axes[None, :]
@@ -163,9 +165,8 @@ def main():
         ax1.plot(xs, p_list, color="#d62728", lw=2, marker="o", ms=3, label="PSNR (dB)")
         ax1.set_xlabel("Open-loop step"); ax1.set_ylabel("PSNR (dB)", color="#d62728")
         ax1.tick_params(axis="y", labelcolor="#d62728"); ax1.grid(alpha=0.3)
-        for k in KEY_STEPS:
-            if k <= args.steps:
-                ax1.axvline(k, color="gray", ls="--", lw=0.8, alpha=0.6)
+        for k in key_steps:
+            ax1.axvline(k, color="gray", ls="--", lw=0.8, alpha=0.6)
         ax2 = ax1.twinx()
         ax2.plot(xs, s_list, color="#1f77b4", lw=1.8, ls="--", label="SSIM")
         ax2.set_ylabel("SSIM", color="#1f77b4"); ax2.tick_params(axis="y", labelcolor="#1f77b4")
@@ -179,10 +180,10 @@ def main():
             "psnr_by_step": [round(x, 3) for x in p_list],
             "ssim_by_step": [round(x, 4) for x in s_list],
             "keypoints": {f"step{k}": {"psnr": round(p_list[k - 1], 3),
-                                       "ssim": round(s_list[k - 1], 4)} for k in KEY_STEPS},
+                                       "ssim": round(s_list[k - 1], 4)} for k in key_steps},
         }
-        print(f"[VIZ] {key} 完成: PSNR 1步={p_list[0]:.1f} 5步={p_list[4]:.1f} "
-              f"10步={p_list[9]:.1f} 20步={p_list[-1]:.1f} dB", flush=True)
+        _brief = " ".join(f"{k}步={p_list[k - 1]:.1f}" for k in key_steps)
+        print(f"[VIZ] {key} 完成: PSNR 1步={p_list[0]:.1f} {_brief} dB", flush=True)
 
     with open(os.path.join(args.out_dir, "compare_summary.json"), "w", encoding="utf-8") as f:
         json.dump(summary, f, ensure_ascii=False, indent=2)
