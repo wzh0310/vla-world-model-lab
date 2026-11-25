@@ -1,0 +1,1037 @@
+{
+  "summary": {
+    "instruction": "push the block onto the red goal",
+    "seed": 2,
+    "target_xy": [
+      0.82,
+      -0.12
+    ],
+    "dist_start": 0.2,
+    "dist_end": 0.2,
+    "dist_min": 0.2,
+    "dist_improvement": -0.0,
+    "success": false,
+    "steps": 30,
+    "total_reward": -1.819,
+    "latency_mean_s": 0.2874,
+    "latency_max_s": 0.3392,
+    "wall_time_s": 57.97,
+    "vram_reserved_gb": 15.532
+  },
+  "steps": [
+    {
+      "step": 1,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        -0.0003137254901960773,
+        0.0020392156862745116,
+        -0.009568627450980393,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": -0.000314,
+        "dy": 0.002039,
+        "dz": -0.009569,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.002063,
+        "move_direction": "横向为主",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        0.012,
+        0.002039,
+        -0.009569
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": 0.0,
+      "reward": -0.065883,
+      "latency_s": 0.2935,
+      "vram_reserved_gb": 15.532,
+      "diagnosis": {
+        "bgr_mapped_4d": [
+          0.002666666666666666,
+          0.0020392156862745116,
+          -0.010666666666666666,
+          0.0
+        ],
+        "bgr_delta_vs_rgb": [
+          0.00298,
+          0.0,
+          -0.001098
+        ],
+        "flip_mapped_4d": [
+          0.0003137254901960773,
+          -0.0020392156862745116,
+          0.009568627450980393,
+          0.0
+        ],
+        "flip_delta_vs_rgb": [
+          0.000627,
+          -0.004078,
+          0.019137
+        ]
+      }
+    },
+    {
+      "step": 2,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.005333333333333332,
+        -0.00611764705882353,
+        -0.005647058823529412,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": 0.005333,
+        "dy": -0.006118,
+        "dz": -0.005647,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.008116,
+        "move_direction": "接近目标",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        0.005333,
+        -0.006118,
+        -0.005647
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.065112,
+      "latency_s": 0.2895,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 3,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.0028235294117647048,
+        0.0009411764705882364,
+        -0.017098039215686277,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": 0.002824,
+        "dy": 0.000941,
+        "dz": -0.017098,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.002976,
+        "move_direction": "接近目标",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        0.002824,
+        0.000941,
+        -0.017098
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.064441,
+      "latency_s": 0.2905,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 4,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.0028235294117647048,
+        0.0009411764705882364,
+        -0.011450980392156862,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": 0.002824,
+        "dy": 0.000941,
+        "dz": -0.011451,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.002976,
+        "move_direction": "接近目标",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        0.002824,
+        0.000941,
+        -0.011451
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.063814,
+      "latency_s": 0.3392,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 5,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        -0.005490196078431371,
+        0.007999999999999998,
+        -0.015372549019607842,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": -0.00549,
+        "dy": 0.008,
+        "dz": -0.015373,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.009703,
+        "move_direction": "远离目标",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        -0.00549,
+        0.008,
+        -0.015373
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.063792,
+      "latency_s": 0.2975,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 6,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.005333333333333332,
+        0.012078431372549022,
+        -0.0028235294117647048,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": 0.005333,
+        "dy": 0.012078,
+        "dz": -0.002824,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.013204,
+        "move_direction": "接近目标",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        0.005333,
+        0.012078,
+        -0.002824
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.063656,
+      "latency_s": 0.2878,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 7,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.004862745098039216,
+        0.00015686274509803865,
+        -0.016,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": 0.004863,
+        "dy": 0.000157,
+        "dz": -0.016,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.004865,
+        "move_direction": "接近目标",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        0.004863,
+        0.000157,
+        -0.016
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.063089,
+      "latency_s": 0.2871,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 8,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.008941176470588235,
+        -0.0069019607843137255,
+        -0.005176470588235294,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": 0.008941,
+        "dy": -0.006902,
+        "dz": -0.005176,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.011295,
+        "move_direction": "接近目标",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        0.008941,
+        -0.006902,
+        -0.005176
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.062192,
+      "latency_s": 0.2959,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 9,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.0,
+        -0.0004705882352941204,
+        -0.006274509803921568,
+        0.996078431372549
+      ],
+      "action_parsed": {
+        "dx": 0.0,
+        "dy": -0.000471,
+        "dz": -0.006275,
+        "gripper": 0.996078,
+        "horizontal_step_m": 0.000471,
+        "move_direction": "横向为主",
+        "gripper_state": "张开"
+      },
+      "ee_delta": [
+        0.0,
+        -0.000471,
+        -0.006275
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.061724,
+      "latency_s": 0.2782,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 10,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.0025098039215686275,
+        -0.0025098039215686254,
+        -0.002666666666666666,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": 0.00251,
+        "dy": -0.00251,
+        "dz": -0.002667,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.003549,
+        "move_direction": "接近目标",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        0.00251,
+        -0.00251,
+        -0.002667
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.061331,
+      "latency_s": 0.2747,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 11,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.0,
+        -0.0004705882352941204,
+        -0.0039215686274509795,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": 0.0,
+        "dy": -0.000471,
+        "dz": -0.003922,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.000471,
+        "move_direction": "横向为主",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        0.0,
+        -0.000471,
+        -0.003922
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.06111,
+      "latency_s": 0.2782,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 12,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.007372549019607844,
+        0.0007843137254901933,
+        -0.005176470588235294,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": 0.007373,
+        "dy": 0.000784,
+        "dz": -0.005176,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.007414,
+        "move_direction": "接近目标",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        0.007373,
+        0.000784,
+        -0.005176
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.060582,
+      "latency_s": 0.2761,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 13,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.0,
+        0.0014117647058823524,
+        -0.003137254901960784,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": 0.0,
+        "dy": 0.001412,
+        "dz": -0.003137,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.001412,
+        "move_direction": "横向为主",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        0.0,
+        0.001412,
+        -0.003137
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.060305,
+      "latency_s": 0.2788,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 14,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        -0.00015686274509803865,
+        0.005333333333333332,
+        -0.01427450980392157,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": -0.000157,
+        "dy": 0.005333,
+        "dz": -0.014275,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.005336,
+        "move_direction": "横向为主",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        -0.000157,
+        0.005333,
+        -0.001686
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.060306,
+      "latency_s": 0.2859,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 15,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        -0.00015686274509803865,
+        0.0029803921568627434,
+        -0.018980392156862744,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": -0.000157,
+        "dy": 0.00298,
+        "dz": -0.01898,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.002985,
+        "move_direction": "横向为主",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        -0.000157,
+        0.00298,
+        0.0
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.060389,
+      "latency_s": 0.2755,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 16,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        -0.00015686274509803865,
+        0.0010980392156862751,
+        -0.0032941176470588254,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": -0.000157,
+        "dy": 0.001098,
+        "dz": -0.003294,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.001109,
+        "move_direction": "横向为主",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        -0.000157,
+        0.001098,
+        0.0
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.060454,
+      "latency_s": 0.2847,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 17,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.005019607843137255,
+        0.0007843137254901933,
+        -0.0014117647058823524,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": 0.00502,
+        "dy": 0.000784,
+        "dz": -0.001412,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.005081,
+        "move_direction": "接近目标",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        0.00502,
+        0.000784,
+        0.0
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.060214,
+      "latency_s": 0.3028,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 18,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        -0.00015686274509803865,
+        0.0010980392156862751,
+        -0.0029803921568627456,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": -0.000157,
+        "dy": 0.001098,
+        "dz": -0.00298,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.001109,
+        "move_direction": "横向为主",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        -0.000157,
+        0.001098,
+        0.0
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.060102,
+      "latency_s": 0.2747,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 19,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        -0.00015686274509803865,
+        0.0010980392156862751,
+        -0.0029803921568627456,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": -0.000157,
+        "dy": 0.001098,
+        "dz": -0.00298,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.001109,
+        "move_direction": "横向为主",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        -0.000157,
+        0.001098,
+        0.0
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.060104,
+      "latency_s": 0.2786,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 20,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        -0.00015686274509803865,
+        0.0010980392156862751,
+        -0.0029803921568627456,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": -0.000157,
+        "dy": 0.001098,
+        "dz": -0.00298,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.001109,
+        "move_direction": "横向为主",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        -0.000157,
+        0.001098,
+        0.0
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.06014,
+      "latency_s": 0.2869,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 21,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.007686274509803921,
+        -0.0018823529411764728,
+        -0.005176470588235294,
+        0.996078431372549
+      ],
+      "action_parsed": {
+        "dx": 0.007686,
+        "dy": -0.001882,
+        "dz": -0.005176,
+        "gripper": 0.996078,
+        "horizontal_step_m": 0.007913,
+        "move_direction": "接近目标",
+        "gripper_state": "张开"
+      },
+      "ee_delta": [
+        0.007686,
+        -0.001882,
+        0.0
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.059705,
+      "latency_s": 0.2765,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 22,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.007372549019607844,
+        -0.003137254901960784,
+        0.003450980392156864,
+        0.996078431372549
+      ],
+      "action_parsed": {
+        "dx": 0.007373,
+        "dy": -0.003137,
+        "dz": 0.003451,
+        "gripper": 0.996078,
+        "horizontal_step_m": 0.008012,
+        "move_direction": "接近目标",
+        "gripper_state": "张开"
+      },
+      "ee_delta": [
+        0.007373,
+        -0.003137,
+        0.003451
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.059045,
+      "latency_s": 0.3017,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 23,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        -0.00015686274509803865,
+        0.0010980392156862751,
+        -0.0032941176470588254,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": -0.000157,
+        "dy": 0.001098,
+        "dz": -0.003294,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.001109,
+        "move_direction": "横向为主",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        -0.000157,
+        0.001098,
+        -0.003294
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.058735,
+      "latency_s": 0.2741,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 24,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.005019607843137255,
+        0.002666666666666666,
+        -0.0029803921568627456,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": 0.00502,
+        "dy": 0.002667,
+        "dz": -0.00298,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.005684,
+        "move_direction": "接近目标",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        0.00502,
+        0.002667,
+        -0.000157
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.058416,
+      "latency_s": 0.3022,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 25,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.002352941176470589,
+        0.0056470588235294095,
+        -0.011294117647058824,
+        0.996078431372549
+      ],
+      "action_parsed": {
+        "dx": 0.002353,
+        "dy": 0.005647,
+        "dz": -0.011294,
+        "gripper": 0.996078,
+        "horizontal_step_m": 0.006118,
+        "move_direction": "接近目标",
+        "gripper_state": "张开"
+      },
+      "ee_delta": [
+        0.002353,
+        0.005647,
+        0.0
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.058238,
+      "latency_s": 0.3035,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 26,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.005019607843137255,
+        0.0007843137254901933,
+        -0.0029803921568627456,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": 0.00502,
+        "dy": 0.000784,
+        "dz": -0.00298,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.005081,
+        "move_direction": "接近目标",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        0.00502,
+        0.000784,
+        0.0
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.057922,
+      "latency_s": 0.2799,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 27,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.004862745098039216,
+        0.000470588235294116,
+        -0.007372549019607844,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": 0.004863,
+        "dy": 0.000471,
+        "dz": -0.007373,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.004885,
+        "move_direction": "接近目标",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        0.004863,
+        0.000471,
+        0.0
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.057513,
+      "latency_s": 0.2864,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 28,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.004862745098039216,
+        0.000470588235294116,
+        -0.004862745098039216,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": 0.004863,
+        "dy": 0.000471,
+        "dz": -0.004863,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.004885,
+        "move_direction": "接近目标",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        0.004863,
+        0.000471,
+        0.0
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.057078,
+      "latency_s": 0.285,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 29,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.0014117647058823524,
+        0.0017254901960784296,
+        -0.005176470588235294,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": 0.001412,
+        "dy": 0.001725,
+        "dz": -0.005176,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.002229,
+        "move_direction": "接近目标",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        0.001412,
+        0.001725,
+        0.0
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.056845,
+      "latency_s": 0.279,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "step": 30,
+      "instruction": "push the block onto the red goal",
+      "mapped_4d": [
+        0.0,
+        0.0017254901960784296,
+        -0.003137254901960784,
+        0.0
+      ],
+      "action_parsed": {
+        "dx": 0.0,
+        "dy": 0.001725,
+        "dz": -0.003137,
+        "gripper": 0.0,
+        "horizontal_step_m": 0.001725,
+        "move_direction": "横向为主",
+        "gripper_state": "闭合"
+      },
+      "ee_delta": [
+        0.0,
+        0.001725,
+        0.0
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_to_target": 0.2,
+      "dist_delta": -0.0,
+      "reward": -0.0568,
+      "latency_s": 0.2768,
+      "vram_reserved_gb": 15.532
+    }
+  ]
+}

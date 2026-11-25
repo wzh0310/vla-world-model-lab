@@ -1,0 +1,73 @@
+{
+  "config": {
+    "quant": "none",
+    "unnorm_key": "bridge_orig",
+    "scale_m": 0.02,
+    "max_steps": 30,
+    "seed": 0,
+    "n_instructions": 3,
+    "model_dir": "/data/wzh/robot/models/openvla-7b"
+  },
+  "episodes": [
+    {
+      "instruction": "push the cube to the red target",
+      "seed": 0,
+      "target_xy": [
+        0.82,
+        -0.12
+      ],
+      "dist_start": 0.2,
+      "dist_end": 0.2,
+      "dist_min": 0.2,
+      "dist_improvement": -0.0,
+      "success": false,
+      "steps": 30,
+      "total_reward": -1.6637,
+      "latency_mean_s": 0.3047,
+      "latency_max_s": 0.3864,
+      "wall_time_s": 62.21,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "instruction": "move the cube to the red circle",
+      "seed": 1,
+      "target_xy": [
+        0.82,
+        -0.12
+      ],
+      "dist_start": 0.2,
+      "dist_end": 0.2,
+      "dist_min": 0.2,
+      "dist_improvement": -0.0,
+      "success": false,
+      "steps": 30,
+      "total_reward": -1.6341,
+      "latency_mean_s": 0.3006,
+      "latency_max_s": 0.405,
+      "wall_time_s": 58.94,
+      "vram_reserved_gb": 15.532
+    },
+    {
+      "instruction": "push the block onto the red goal",
+      "seed": 2,
+      "target_xy": [
+        0.82,
+        -0.12
+      ],
+      "dist_start": 0.2,
+      "dist_end": 0.2,
+      "dist_min": 0.2,
+      "dist_improvement": -0.0,
+      "success": false,
+      "steps": 30,
+      "total_reward": -1.819,
+      "latency_mean_s": 0.2874,
+      "latency_max_s": 0.3392,
+      "wall_time_s": 57.97,
+      "vram_reserved_gb": 15.532
+    }
+  ],
+  "success_rate": 0.0,
+  "mean_latency_s": 0.2976,
+  "total_wall_s": 210.07
+}
