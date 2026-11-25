@@ -23,6 +23,8 @@ vla/
 │   └── plot_closed_loop.py           # 闭环结果可视化
 ├── utils/
 │   └── vla_adapter.py        # 图像预处理 / 动作映射 / 结果解析 / 模型封装
+├── data/
+│   └── instruction_templates.py  # 5 类 20 条指令模板库与均衡分配
 └── configs/
     ├── openvla.yaml          # 模型与推理参数、实测性能基线、依赖锁定
     └── pushcube_action.yaml  # 动作空间与映射口径
@@ -125,8 +127,31 @@ OpenVLA 输出 7 维末端增量，PushCube 只接受 4 维动作，映射分四
 
 完整数据与图表见 `results/vla_closed_loop/` 与 `docs/OpenVLA闭环推理测试与问题排查.md`。
 
+## 自定义 VLA 数据集（微调前置）
+
+为零样本闭环失败提供域内数据，已构建一套轻量化专家数据集：
+
+| 项 | 值 |
+|---|---|
+| 轨迹 / 帧数 | 25 条 / 928 帧（单条 36–40 帧，均值 37.1） |
+| 指令 | 5 类共 20 条模板，每条模板至少 1 条轨迹（全覆盖） |
+| 起点随机化 | 立方体 x/y ±0.05 m、机械臂 xyz 扰动；终点 dist ≤ 0.028 m 全部达标 |
+| 字段 | 图像 / 4 维动作 / 13 维状态 / **时间戳** / 指令文本 / 模板 id / 达标标志 |
+| 落盘 | 仓库外 `/data/wzh/robot/datasets/vla_pushcube_25/`（npz + manifest + quality + verify，不入库） |
+
+```bash
+MUJOCO_GL=egl /opt/miniconda3/envs/mujoco/bin/python scripts/collect_vla_demos.py \
+  --episodes 180 --select 25 --seed 20261125 --out /data/wzh/robot/datasets/vla_pushcube_25
+/opt/miniconda3/envs/vla/bin/python scripts/verify_vla_dataset.py --root /data/wzh/robot/datasets/vla_pushcube_25
+/opt/miniconda3/envs/vla/bin/python scripts/visualize_vla_dataset.py
+```
+
+采集复用既有 `collect_demos_v3.py` 的专家控制律，新增起点大幅随机化、时间戳、指令分配与穿模筛选。
+完整设计与字段规范见 `docs/VLA数据集方案与指令模板库.md` 与 `docs/LoRA微调配置与数据集字段规范.md`。
+
 ## 已知限制与下一步
 
-1. 零样本无法完成任务，需 LoRA 微调注入域内数据（配置调研见 `docs/LoRA微调配置与数据集字段规范.md`）；
+1. 零样本无法完成任务，需用上述域内数据做 LoRA 微调（配置见 `docs/LoRA微调配置与数据集字段规范.md`）；
 2. 推理速度瓶颈在自回归生成 7 个动作 token（约 3.4 Hz），换流匹配模型（π0 / SmolVLA）可提升吞吐；
-3. 单步闭环使用跨本体启发式映射，非物理标定；微调阶段应改用真实动作空间对齐。
+3. 单步闭环使用跨本体启发式映射，非物理标定；微调阶段应改用真实动作空间对齐；
+4. 数据集为脚本化专家轨迹、夹爪恒为 0（推物任务无需抓取）；扩维到 7 维时旋转补 0、夹爪二值化。

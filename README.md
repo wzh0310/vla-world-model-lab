@@ -148,6 +148,7 @@ vla-world-model-lab/
 ├── vla/                    # VLA 推理模块 v0.1（详见 vla/README.md）
 │   ├── inference/          # OpenVLA 推理脚本（验证 / 单步 / 闭环 / 可视化）
 │   ├── utils/              # 图像预处理、动作映射、模型封装工具
+│   ├── data/               # 指令模板库（5 类 20 条）与数据方案配套工具
 │   └── configs/            # 模型参数与动作空间 YAML
 ├── results/                # 实验结果、图表、演示视频（入库）
 ├── demos/                  # 关键场景截图与演示素材（入库）
@@ -206,6 +207,23 @@ $VLA vla/inference/rollout_vla_closed_loop.py --max-steps 30 --save-frames --dia
 > 闭环脚本采用跨环境注入：在 `vla` 进程中追加 `mujoco` 环境的 `site-packages`
 > 以获得 `gymnasium`/`mujoco`（两环境 torch/numpy 版本一致）。这与上文的严格隔离不冲突——
 > 世界模型训练仍只用 `vla`，仿真原生脚本仍用 `$MUJOCO`，注入仅限 VLA 闭环这一处。
+
+### 5.1.2 自定义 VLA 数据集构建
+
+面向 LoRA 微调的域内数据已构建完成：**25 条专家轨迹 / 928 帧 / 20 条指令模板（5 类表述）**，
+起点 ±0.05 m 随机化，全部到达目标。方案与模板库见
+`docs/VLA数据集方案与指令模板库.md` 与 `vla/data/instruction_templates.py`；原始数据落在
+仓库外 `/data/wzh/robot/datasets/vla_pushcube_25/`（不入库）。
+
+```bash
+# mujoco 环境采集（EGL 离屏渲染，约十余分钟）
+MUJOCO_GL=egl $MUJOCO scripts/collect_vla_demos.py --episodes 180 --select 25 \
+  --seed 20261125 --out /data/wzh/robot/datasets/vla_pushcube_25
+# 校验（任意环境，只读 numpy）
+$VLA scripts/verify_vla_dataset.py --root /data/wzh/robot/datasets/vla_pushcube_25
+# 可视化抽检 -> results/vla_dataset/vla_dataset_grid.png
+$VLA scripts/visualize_vla_dataset.py
+```
 
 ### 5.2 数据准备
 
