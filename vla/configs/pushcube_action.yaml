@@ -1,0 +1,52 @@
+# ============================================================================
+# PushCube 动作空间与映射配置
+# ----------------------------------------------------------------------------
+# 定义 OpenVLA 7 维输出 → MuJoCo PushCube 4 维动作的映射口径。
+# 与 envs/push_cube_env.py 的 ACTION_LOW/HIGH 严格对齐。
+# ============================================================================
+
+env:
+  repo: /data/wzh/robot/mujoco-studio-lab
+  id: PushCube-v0
+  camera: global_cam
+  image_size: 224
+
+# 环境真实动作空间（与 PushCubeEnv.action_space 一致）
+action_space:
+  dim: 4
+  low: [-0.02, -0.02, -0.02, 0.0]
+  high: [0.02, 0.02, 0.02, 1.0]
+  names: [dx, dy, dz, gripper]
+  per_step_translation_m: 0.02   # 每步末端位移上限
+
+# OpenVLA 原始输出
+vla_output:
+  dim: 7
+  names: [dx, dy, dz, drx, dry, drz, gripper]
+  normalized_range: [-1, 1]
+  unnorm_stats_key: bridge_orig  # config.json → norm_stats[key]["q01"/"q99"]
+
+# 映射规则（utils/vla_adapter.py::map_action 实现）
+mapping:
+  # 1) 先用 q01/q99 把反归一化物理增量还原回 [-1,1]
+  #    unit = clip(2*(raw-q01)/(q99-q01) - 1, -1, 1)
+  restore_unit: true
+  # 2) 丢弃 3 维旋转（drx/dry/drz）——推物任务无需旋转
+  drop_rotation: [3, 4, 5]
+  # 3) 位置增量线性缩放：env_xyz = unit[:3] * scale
+  translation_scale_m: 0.02
+  # 4) 夹爪 [-1,1] → [0,1]
+  gripper_formula: "(g + 1) / 2"
+  # 环境注释：夹爪位接口保留，但不参与本任务动力学
+  gripper_active: false
+
+# 诊断开关（脚本 --diagnose 使用）
+diagnostics:
+  channel_mode: rgb            # rgb | bgr，BGR 仅作对照实验
+  flip_xyz: false              # true 时位置三维取反，验证方向反转问题
+
+# 任务判定
+success:
+  radius_m: 0.03               # 立方体中心距目标 < 3cm
+  bonus: 10.0
+  max_episode_steps: 50

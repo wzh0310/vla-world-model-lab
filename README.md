@@ -145,6 +145,10 @@ vla-world-model-lab/
 │   ├── metrics.py          # 像素 / 结构 / 感知 / 动力学四级指标
 │   └── data.py             # 数据集与采样器再导出
 ├── trainer/                # 训练与评估实现模块（含 metrics.py 兼容转发层）
+├── vla/                    # VLA 推理模块 v0.1（详见 vla/README.md）
+│   ├── inference/          # OpenVLA 推理脚本（验证 / 单步 / 闭环 / 可视化）
+│   ├── utils/              # 图像预处理、动作映射、模型封装工具
+│   └── configs/            # 模型参数与动作空间 YAML
 ├── results/                # 实验结果、图表、演示视频（入库）
 ├── demos/                  # 关键场景截图与演示素材（入库）
 ├── weights/                # 模型权重（大文件 .gitignore；获取方式见 weights/README.md）
@@ -186,6 +190,22 @@ MUJOCO=/opt/miniconda3/envs/mujoco/bin/python
 > （`scripts/eval_imagine_policy.py`、`scripts/eval_ablation.py`、`scripts/eval_unified_sfe.py`）
 > 必须用 `$MUJOCO` 运行。本项目提供的 `scripts/run_eval_sfe.sh`、
 > `scripts/run_ablation_eval.sh` 已内置该解释器。
+
+### 5.1.1 VLA 推理模块（v0.1）
+
+基于 OpenVLA 的视觉-语言-动作推理模块已独立成 `vla/`，含模型加载验证、官方示例推理、
+单步与回合级闭环，以及图像预处理 / 动作映射工具。**完整说明见 `vla/README.md`**。
+
+```bash
+# 模型加载验证（bf16；权重不入库，见 vla/configs/openvla.yaml）
+$VLA vla/inference/verify_openvla_load.py --model-dir /data/wzh/robot/models/openvla-7b
+# 回合级闭环推理（单进程注入 mujoco 依赖，模型只加载一次）
+$VLA vla/inference/rollout_vla_closed_loop.py --max-steps 30 --save-frames --diagnose
+```
+
+> 闭环脚本采用跨环境注入：在 `vla` 进程中追加 `mujoco` 环境的 `site-packages`
+> 以获得 `gymnasium`/`mujoco`（两环境 torch/numpy 版本一致）。这与上文的严格隔离不冲突——
+> 世界模型训练仍只用 `vla`，仿真原生脚本仍用 `$MUJOCO`，注入仅限 VLA 闭环这一处。
 
 ### 5.2 数据准备
 

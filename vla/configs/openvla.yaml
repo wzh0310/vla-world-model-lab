@@ -1,0 +1,46 @@
+# ============================================================================
+# OpenVLA 推理配置（模型与推理参数）
+# ----------------------------------------------------------------------------
+# 所有数值均来自容器内 A6000 实测，与 docs/ 下三份 OpenVLA 文档一致。
+# 推理脚本的命令行参数可覆盖本文件默认值（如 --quant / --scale）。
+# ============================================================================
+
+model:
+  # 权重目录在仓库外，不入库；容器内实测路径
+  dir: /data/wzh/robot/models/openvla-7b
+  checkpoint: openvla/openvla-7b          # 来源：ModelScope 镜像 zixiaoBios/openvla-7b
+  params_b: 7.54                           # bf16 参数量
+  vision_backbone: DINOv2-ViT-L/14 + SigLIP-ViT-So400M/14
+  llm_backbone: Llama-2-7B
+
+inference:
+  quant: bf16                 # bf16 | int4；bf16 为默认，int4 用于 <16GB 卡
+  dtype: bfloat16             # int4 量化时输入改 fp16（视觉塔权重为 fp16）
+  device: cuda:0
+  unnorm_key: bridge_orig     # 必须与数据集一致，选错则动作尺度全错
+  image_size: 224
+  prompt_template: "In: What action should the robot take to {instruction}?\nOut:"
+  action_dim: 7               # [dx,dy,dz,drx,dry,drz,gripper]
+  do_sample: false            # 贪心解码
+
+# 实测性能基线（A6000 48GB，批次 1，warmup 后）
+baseline:
+  bf16:
+    latency_s: 0.305          # 官方示例连续 5 次均值
+    hz: 3.65
+    vram_allocated_gb: 15.139
+    vram_reserved_gb: 15.532
+  int4:
+    latency_s: 1.31
+    vram_reserved_gb: 4.55
+    note: 显存降至约 1/3，但吞吐降到 1/4；A6000 上优先 bf16
+
+# 依赖锁定（OpenVLA 官方 requirements-min，实测 pip check 通过）
+deps:
+  transformers: 4.40.1
+  tokenizers: 0.19.1
+  timm: 0.9.10
+  peft: 0.11.1
+  accelerate: 0.30.1          # 新版 1.x 会对 4bit 模型调用 .to() 而报错
+  huggingface_hub: 0.36.0
+  diffusers: 0.30.3
