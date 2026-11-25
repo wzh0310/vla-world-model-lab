@@ -1,0 +1,53 @@
+{
+  "image": "/data/wzh/robot/vla-world-model-lab/results/vla_single_step/observation_224.png",
+  "instruction": "push the cube to the red target",
+  "prompt": "In: What action should the robot take to push the cube to the red target?\nOut:",
+  "unnorm_key": "bridge_orig",
+  "scale_m": 0.02,
+  "raw_7d": [
+    0.009409205051029403,
+    -0.040246580437702295,
+    -0.007776176813332477,
+    -0.003970446181063694,
+    -0.004129921381964441,
+    -0.05647964392105742,
+    0.0
+  ],
+  "raw_names": [
+    "dx",
+    "dy",
+    "dz",
+    "drx",
+    "dry",
+    "drz",
+    "gripper"
+  ],
+  "normalized_7d": [
+    0.3372549019607842,
+    -0.9647058823529413,
+    -0.44705882352941173,
+    -0.054901960784313864,
+    0.039215686274509665,
+    -0.2666666666666666,
+    -1.0
+  ],
+  "ignored_rotation": [
+    -0.054901960784313864,
+    0.039215686274509665,
+    -0.2666666666666666
+  ],
+  "mapped_4d": [
+    0.006745098039215684,
+    -0.019294117647058826,
+    -0.008941176470588235,
+    0.0
+  ],
+  "mapped_names": [
+    "dx",
+    "dy",
+    "dz",
+    "gripper"
+  ],
+  "latency_s": 0.274,
+  "vram_gb": 15.532
+}

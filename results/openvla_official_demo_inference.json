@@ -1,0 +1,35 @@
+{
+  "image": "/data/wzh/robot/vla-world-model-lab/results/openvla_official_demo.jpg",
+  "instruction": "put the yellow corn on the plate",
+  "prompt": "In: What action should the robot take to put the yellow corn on the plate?\nOut:",
+  "unnorm_key": "bridge_orig",
+  "action_raw": {
+    "dx": -0.00916,
+    "dy": -0.00107,
+    "dz": -0.00154,
+    "drx": -0.01099,
+    "dry": -0.00279,
+    "drz": 0.01766,
+    "gripper": 0.99608
+  },
+  "action_normalized": {
+    "dx": -0.31373,
+    "dy": -0.01569,
+    "dz": -0.25882,
+    "drx": -0.14118,
+    "dry": 0.0549,
+    "drz": 0.09412,
+    "gripper": 0.99216
+  },
+  "latency_s": {
+    "mean": 0.2738,
+    "std": 0.0012,
+    "min": 0.272,
+    "max": 0.2754,
+    "hz": 3.65
+  },
+  "vram": {
+    "allocated_gb": 15.139,
+    "reserved_gb": 15.532
+  }
+}

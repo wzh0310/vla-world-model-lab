@@ -1,0 +1,27 @@
+{
+  "action": [
+    0.006745098039215684,
+    -0.019294117647058826,
+    -0.008941176470588235,
+    0.0
+  ],
+  "ee_delta": [
+    0.012,
+    -0.019294,
+    -0.008941
+  ],
+  "cube_delta_xy": [
+    0.0,
+    0.0
+  ],
+  "cube_dist_before": 0.2,
+  "cube_dist_after": 0.2,
+  "dist_change": 0.0,
+  "reward": -0.065672,
+  "terminated": false,
+  "truncated": false,
+  "target_xy": [
+    0.82,
+    -0.12
+  ]
+}
