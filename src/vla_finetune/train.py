@@ -74,6 +74,14 @@ def parse_args():
     ap.add_argument("--max-grad-norm", type=float, default=None,
                     help="覆盖梯度裁剪阈值（默认 1.0）")
     ap.add_argument("--out-dir", default=None)
+    ap.add_argument("--lora-rank", type=int, default=None,
+                    help="覆盖 LoRA 秩（消融实验用）")
+    ap.add_argument("--lora-alpha", type=int, default=None,
+                    help="覆盖 LoRA alpha（消融实验用）")
+    ap.add_argument("--max-steps", type=int, default=None,
+                    help="覆盖 optimizer 总步数（消融固定预算用）")
+    ap.add_argument("--lr-scheduler", default=None,
+                    help="覆盖学习率调度器（消融对照用，如 constant）")
     return ap.parse_args()
 
 
@@ -180,6 +188,15 @@ def main():
         print(f"[override] max_grad_norm -> {args.max_grad_norm}", flush=True)
     if args.out_dir is not None:
         cfg["out_dir"] = args.out_dir
+    if args.lora_rank is not None:
+        cfg["lora_rank"] = args.lora_rank
+        print(f"[override] lora_rank -> {args.lora_rank}", flush=True)
+    if args.lora_alpha is not None:
+        cfg["lora_alpha"] = args.lora_alpha
+        print(f"[override] lora_alpha -> {args.lora_alpha}", flush=True)
+    if args.lr_scheduler is not None:
+        cfg["lr_scheduler"] = args.lr_scheduler
+        print(f"[override] lr_scheduler -> {args.lr_scheduler}", flush=True)
 
     seed = int(cfg.get("seed", 42))
     random.seed(seed)
@@ -315,7 +332,8 @@ def main():
         bf16=False,   # 4bit + fp16 视觉输入；关闭 autocast 避免 dtype 冲突
         fp16=False,
         seed=seed,
-        max_steps=args.smoke_steps if args.smoke else -1,
+        max_steps=args.max_steps if args.max_steps is not None
+        else (args.smoke_steps if args.smoke else -1),
     )
     trainer = QLoRATrainer(
         model=model,

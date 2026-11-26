@@ -18,3 +18,13 @@ results/vla_finetune_tuned/adapter/
 results/vla_finetune_tuned/trainer_ckpt/
 *.pid
 results/vla_finetune_tuned/*.log
+
+# 秩消融产物：大权重/优化器状态不入库，仅 JSON + PNG + 表格入库
+# 秩消融：忽略大权重/优化器状态与日志，保留 JSON 结果供复核
+results/vla_ablation/rank*/best_adapter/
+results/vla_ablation/rank*/adapter/
+results/vla_ablation/rank*/trainer_ckpt/
+results/vla_ablation/*.log
+results/vla_ablation/DONE
+results/vla_ablation/SUMMARIZED
+results/vla_ablation/rank8_constlr/CTRL_DONE

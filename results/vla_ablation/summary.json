@@ -1,0 +1,176 @@
+{
+  "protocol": {
+    "fixed": [
+      "dataset(hf_dataset v1.0)",
+      "lr=1e-4",
+      "warmup=50",
+      "seed=42",
+      "max_steps=192",
+      "eval: 5 instr x 3 episodes, seed_base=100, max_steps=40"
+    ],
+    "varied": "LoRA rank/alpha only (alpha/r=2 constant)"
+  },
+  "groups": [
+    {
+      "rank": 4,
+      "alpha": 8,
+      "trainable_params": 2097152,
+      "trainable_pct": 0.0537,
+      "steps": 192,
+      "loss_first": 12.8639,
+      "loss_last": 0.9801,
+      "best_eval_loss": 2.067151,
+      "best_step": 192,
+      "final_eval_loss": 2.067151,
+      "total_episodes": 15,
+      "total_successes": 0,
+      "success_rate": 0.0,
+      "mean_dist_improvement": -0.009801,
+      "per_instruction": {
+        "push the cube to the red target": {
+          "episodes": 3,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_dist_improvement": 0.089959
+        },
+        "push the cube into the red marked area": {
+          "episodes": 3,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_dist_improvement": -0.119904
+        },
+        "move block to red target": {
+          "episodes": 3,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_dist_improvement": -0.047228
+        },
+        "slide the cube ahead to the red goal": {
+          "episodes": 3,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_dist_improvement": -0.027042
+        },
+        "push the block onto the red disc": {
+          "episodes": 3,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_dist_improvement": 0.055212
+        }
+      },
+      "elapsed_s": 1207.07
+    },
+    {
+      "rank": 8,
+      "alpha": 16,
+      "trainable_params": 4194304,
+      "trainable_pct": 0.1075,
+      "steps": 192,
+      "loss_first": 12.8639,
+      "loss_last": 0.7293,
+      "best_eval_loss": 2.003703,
+      "best_step": 192,
+      "final_eval_loss": 2.003703,
+      "total_episodes": 15,
+      "total_successes": 0,
+      "success_rate": 0.0,
+      "mean_dist_improvement": -0.07817,
+      "per_instruction": {
+        "push the cube to the red target": {
+          "episodes": 3,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_dist_improvement": -0.120619
+        },
+        "push the cube into the red marked area": {
+          "episodes": 3,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_dist_improvement": -0.160415
+        },
+        "move block to red target": {
+          "episodes": 3,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_dist_improvement": -0.059394
+        },
+        "slide the cube ahead to the red goal": {
+          "episodes": 3,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_dist_improvement": -0.022922
+        },
+        "push the block onto the red disc": {
+          "episodes": 3,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_dist_improvement": -0.027501
+        }
+      },
+      "elapsed_s": 1208.77
+    },
+    {
+      "rank": 16,
+      "alpha": 32,
+      "trainable_params": 8388608,
+      "trainable_pct": 0.2149,
+      "steps": 192,
+      "loss_first": 12.8639,
+      "loss_last": 0.538,
+      "best_eval_loss": 1.963179,
+      "best_step": 192,
+      "final_eval_loss": 1.963179,
+      "total_episodes": 15,
+      "total_successes": 0,
+      "success_rate": 0.0,
+      "mean_dist_improvement": -0.099648,
+      "per_instruction": {
+        "push the cube to the red target": {
+          "episodes": 3,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_dist_improvement": -0.071486
+        },
+        "push the cube into the red marked area": {
+          "episodes": 3,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_dist_improvement": -0.194303
+        },
+        "move block to red target": {
+          "episodes": 3,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_dist_improvement": -0.027443
+        },
+        "slide the cube ahead to the red goal": {
+          "episodes": 3,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_dist_improvement": -0.028566
+        },
+        "push the block onto the red disc": {
+          "episodes": 3,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_dist_improvement": -0.17644
+        }
+      },
+      "elapsed_s": 1209.11
+    }
+  ],
+  "reference_not_same_budget": {
+    "zero_shot_full": {
+      "success_rate": 0.0,
+      "mean_dist_improvement": 0.0
+    },
+    "rank8_fulltrain": {
+      "success_rate": 0.2,
+      "mean_dist_improvement": 0.054526
+    },
+    "rank8_constlr": {
+      "success_rate": 0.4,
+      "mean_dist_improvement": 0.049973
+    }
+  }
+}
