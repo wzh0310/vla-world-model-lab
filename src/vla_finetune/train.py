@@ -42,6 +42,7 @@ from transformers import (
     AutoProcessor,
     BitsAndBytesConfig,
     Trainer,
+    TrainerCallback,
     TrainingArguments,
     set_seed,
 )
@@ -68,6 +69,10 @@ def parse_args():
                     help="smoke 最大 optimizer 步数")
     ap.add_argument("--epochs", type=int, default=None)
     ap.add_argument("--batch-size", type=int, default=None)
+    ap.add_argument("--learning-rate", type=float, default=None,
+                    help="覆盖配置学习率（震荡时降至 1e-4）")
+    ap.add_argument("--max-grad-norm", type=float, default=None,
+                    help="覆盖梯度裁剪阈值（默认 1.0）")
     ap.add_argument("--out-dir", default=None)
     return ap.parse_args()
 
@@ -101,6 +106,65 @@ class QLoRATrainer(Trainer):
         return (loss, outputs) if return_outputs else loss
 
 
+class BestCheckpointCallback(TrainerCallback):
+    """每个 epoch 结束时比较 eval_loss，仅保留验证 loss 最低的 adapter 权重。
+
+    4bit 量化模型的 Trainer 内建 checkpoint 会保存 optimizer/fp32 状态且禁用
+    load_best_model_at_end 时行为不稳，因此这里用回调显式保存 PEFT adapter
+    （几十 MB），并同步保存 processor 与元信息，规避大权重与 dtype 问题。
+    """
+
+    def __init__(self, model, processor, out_dir: Path, meta: dict, eval_every: int = 1):
+        self.model = model
+        self.processor = processor
+        self.out_dir = Path(out_dir)
+        self.meta = dict(meta)
+        self.eval_every = int(eval_every)
+        self.best_eval_loss = float("inf")
+        self.best_epoch = None
+        self.best_step = None
+        self.history = []  # [{epoch, step, eval_loss, improved}]
+
+    def on_evaluate(self, args, state, control, model=None, metrics=None, **kwargs):
+        if metrics is None or "eval_loss" not in metrics:
+            return
+        ev = float(metrics["eval_loss"])
+        if not np.isfinite(ev):
+            return
+        epoch = float(state.epoch or 0)
+        step = int(state.global_step or 0)
+        improved = ev < self.best_eval_loss
+        self.history.append({
+            "epoch": round(epoch, 4), "step": step,
+            "eval_loss": round(ev, 6), "improved": bool(improved),
+        })
+        tag = "IMPROVED" if improved else "not-better"
+        print(f"[checkpoint] eval@epoch={epoch:.2f} step={step} "
+              f"eval_loss={ev:.4f} best={self.best_eval_loss:.4f} [{tag}]", flush=True)
+        if improved:
+            self.best_eval_loss = ev
+            self.best_epoch = epoch
+            self.best_step = step
+            best_dir = self.out_dir / "best_adapter"
+            best_dir.mkdir(parents=True, exist_ok=True)
+            m = model if model is not None else self.model
+            m.save_pretrained(str(best_dir))
+            self.processor.save_pretrained(str(best_dir))
+            meta = dict(self.meta)
+            meta.update({
+                "kind": "best_by_eval_loss",
+                "eval_loss": round(ev, 6),
+                "epoch": round(epoch, 4),
+                "global_step": step,
+            })
+            with open(best_dir / "finetune_meta.json", "w", encoding="utf-8") as f:
+                json.dump(meta, f, ensure_ascii=False, indent=2)
+            # 每轮刷新一份 JSON 摘要，便于训练中实时查看
+            with open(self.out_dir / "best_checkpoint.json", "w", encoding="utf-8") as f:
+                json.dump(meta, f, ensure_ascii=False, indent=2)
+            print(f"[checkpoint] 已保存最优权重 -> {best_dir}", flush=True)
+
+
 def main():
     args = parse_args()
     cfg = load_yaml(ROOT / args.config)
@@ -108,6 +172,12 @@ def main():
         cfg["epochs"] = args.epochs
     if args.batch_size is not None:
         cfg["batch_size"] = args.batch_size
+    if args.learning_rate is not None:
+        cfg["learning_rate"] = args.learning_rate
+        print(f"[override] learning_rate -> {args.learning_rate}", flush=True)
+    if args.max_grad_norm is not None:
+        cfg["max_grad_norm"] = args.max_grad_norm
+        print(f"[override] max_grad_norm -> {args.max_grad_norm}", flush=True)
     if args.out_dir is not None:
         cfg["out_dir"] = args.out_dir
 
@@ -201,6 +271,7 @@ def main():
     eval_ds = HFDatasetForTrainer(os.path.join(cfg["hf_dataset"], "val"))
     collator = TrainerCollator(processor, tokenizer, action_dim=int(cfg["action_dim"]))
     smoke_note = None
+    eval_note = None
     if args.smoke:
         n = max(int(len(train_ds) * 0.01), cfg["batch_size"] * cfg["grad_accum"])
         train_ds = torch.utils.data.Subset(train_ds, range(n))
@@ -208,6 +279,14 @@ def main():
         eval_ds = torch.utils.data.Subset(eval_ds, range(eval_n))
         smoke_note = f"1% 数据={n} 帧（不少于 1 个完整累积 batch）"
         print(f"[smoke] {smoke_note}, eval={eval_n}", flush=True)
+    else:
+        # 全量验证集 882 帧逐次全评估成本高；用固定前 N 帧做收敛监控与最优权重选择。
+        eval_cap = int(cfg.get("eval_subset_size", 128))
+        n_val = len(eval_ds)
+        if 0 < eval_cap < n_val:
+            eval_ds = torch.utils.data.Subset(eval_ds, range(eval_cap))
+            eval_note = f"验证监控子集=前 {eval_cap}/{n_val} 帧（非全验证集）"
+            print(f"[eval] {eval_note}", flush=True)
 
     # ---- 6) TrainingArguments ----
     warmup = cfg["warmup_steps"]
@@ -227,8 +306,9 @@ def main():
         weight_decay=float(cfg.get("weight_decay", 0.0)),
         max_grad_norm=float(cfg.get("max_grad_norm", 1.0)),
         logging_steps=1,
-        save_strategy="no",
-        evaluation_strategy="no",
+        save_strategy="no",  # 最优权重由 BestCheckpointCallback 显式保存，避免 4bit 内建 ckpt 问题
+        evaluation_strategy="steps" if not args.smoke else "no",
+        eval_steps=int(cfg.get("eval_steps", 64)) if not args.smoke else None,
         report_to=[],
         remove_unused_columns=False,
         dataloader_num_workers=0,
@@ -244,6 +324,27 @@ def main():
         eval_dataset=eval_ds,
         data_collator=collator,
     )
+
+    best_cb = None
+    if not args.smoke:
+        best_cb = BestCheckpointCallback(
+            model=model, processor=processor, out_dir=out_dir,
+            meta={
+                "model_dir": model_dir,
+                "quant": "int4-nf4",
+                "unnorm_key": unnorm_key,
+                "action_dim": int(cfg["action_dim"]),
+                "prompt_template": "In: What action should the robot take to {instruction}?\\nOut:",
+                "lora": {"rank": cfg["lora_rank"], "alpha": cfg["lora_alpha"],
+                         "dropout": cfg["lora_dropout"], "target": LORA_TARGET_PATTERN},
+                "norm_stats": {"min": lo, "max": hi},
+                "learning_rate": float(cfg["learning_rate"]),
+                "max_grad_norm": float(cfg["max_grad_norm"]),
+            },
+        )
+        trainer.add_callback(best_cb)
+        print(f"[checkpoint] 每 {cfg.get('eval_steps', 64)} 步评估，"
+              f"保留 eval_loss 最低的 adapter -> {out_dir / 'best_adapter'}", flush=True)
 
     # ---- 7) 训练（记录每步 loss） ----
     print(f"[train] 开始 epochs={cfg['epochs']} bs={cfg['batch_size']} "
@@ -282,9 +383,10 @@ def main():
     out_rec = {
         "mode": "smoke" if args.smoke else "full",
         "smoke_note": smoke_note,
+        "eval_note": eval_note,
         "config": {k: cfg[k] for k in ("learning_rate", "batch_size", "grad_accum",
                                        "epochs", "warmup_steps", "lora_rank",
-                                       "lora_alpha", "lora_dropout")},
+                                       "lora_alpha", "lora_dropout", "max_grad_norm")},
         "warmup_effective": warmup,
         "n_params_b": round(n_params / 1e9, 3),
         "trainable_params": trainable,
@@ -300,6 +402,13 @@ def main():
         "eval_loss": float(eval_metrics.get("eval_loss", float("nan"))),
         "elapsed_s": round(time.time() - started, 2),
         "adapter": str(adapter_dir),
+        "best_checkpoint": {
+            "eval_loss": round(best_cb.best_eval_loss, 6) if best_cb else None,
+            "epoch": round(best_cb.best_epoch, 4) if best_cb and best_cb.best_epoch else None,
+            "global_step": best_cb.best_step if best_cb else None,
+            "eval_history": best_cb.history if best_cb else [],
+            "path": str(out_dir / "best_adapter") if best_cb else None,
+        },
     }
     out_file = out_dir / ("trainer_smoke_result.json" if args.smoke
                           else "trainer_train_result.json")

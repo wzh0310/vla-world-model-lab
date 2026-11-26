@@ -12,3 +12,9 @@ results/vla_finetune/checkpoint-*/
 results/vla_finetune_trainer/smoke_adapter/
 results/vla_finetune_trainer/adapter/
 results/vla_finetune_trainer/trainer_ckpt/
+results/vla_finetune_trainer/best_adapter/
+results/vla_finetune_tuned/best_adapter/
+results/vla_finetune_tuned/adapter/
+results/vla_finetune_tuned/trainer_ckpt/
+*.pid
+results/vla_finetune_tuned/*.log

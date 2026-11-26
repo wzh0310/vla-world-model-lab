@@ -1,0 +1,33 @@
+{
+  "model_dir": "/data/wzh/robot/models/openvla-7b",
+  "quant": "int4-nf4",
+  "unnorm_key": "pushcube_vla",
+  "action_dim": 7,
+  "prompt_template": "In: What action should the robot take to {instruction}?\\nOut:",
+  "lora": {
+    "rank": 8,
+    "alpha": 16,
+    "dropout": 0.05,
+    "target": "language_model\\.model\\.layers\\.\\d+\\.self_attn\\.(?:q_proj|v_proj)"
+  },
+  "norm_stats": {
+    "min": [
+      0.0,
+      -0.009620249271392822,
+      -0.0031751515343785286,
+      0.0
+    ],
+    "max": [
+      0.019999999552965164,
+      0.00800000037997961,
+      0.0,
+      0.0
+    ]
+  },
+  "learning_rate": 0.0002,
+  "max_grad_norm": 1.0,
+  "kind": "best_by_eval_loss",
+  "eval_loss": 1.966658,
+  "epoch": 0.7596,
+  "global_step": 192
+}

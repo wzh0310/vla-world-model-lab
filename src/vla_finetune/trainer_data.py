@@ -73,7 +73,9 @@ class TrainerCollator:
         prompts = [x["prompt"] for x in items]
         images = [x["image"] for x in items]
         # processor 内部按 DINOv2 / SigLIP 双主干口径归一化，输出 pixel_values [B,6,224,224]
-        encoded = self.processor(text=prompts, images=images, return_tensors="pt")
+        # 不同指令 token 长度不同，必须 padding 才能组成 batch tensor。
+        encoded = self.processor(text=prompts, images=images,
+                                 padding=True, return_tensors="pt")
         input_ids = encoded["input_ids"]
         attention_mask = encoded["attention_mask"]
 

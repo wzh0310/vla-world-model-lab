@@ -26,9 +26,11 @@ optim:
   epochs: 10
   batch_size: 4
   grad_accum: 4              # 等效 batch 16
-  max_grad_norm: 1.0
+  max_grad_norm: 1.0      # 梯度裁剪阈值；loss 震荡时可显式保持 1.0
   warmup_steps: 50
   lr_scheduler: linear
+  eval_steps: 64          # 每 64 optimizer 步评估一次，保留 eval_loss 最低权重
+  eval_subset_size: 128   # 收敛监控用的验证子集帧数（非全验证集）
 
 runtime:
   seed: 42

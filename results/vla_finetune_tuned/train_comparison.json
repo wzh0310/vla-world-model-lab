@@ -1,0 +1,113 @@
+{
+  "baseline_lr2e4": {
+    "records": 256,
+    "ep1_records": 256,
+    "ep1_first": 12.8639,
+    "ep1_last": 0.2599,
+    "ep1_segments": [
+      6.7266,
+      0.7032,
+      0.4392,
+      0.3091
+    ],
+    "grad_mean": 3.38,
+    "grad_max": 11.759
+  },
+  "tuned_lr1e4": {
+    "records": 256,
+    "ep1_records": 256,
+    "ep1_first": 12.8639,
+    "ep1_last": 0.3807,
+    "ep1_segments": [
+      8.6783,
+      1.1215,
+      0.6079,
+      0.452
+    ],
+    "grad_mean": 4.068,
+    "grad_max": 12.477
+  },
+  "baseline_best": {
+    "model_dir": "/data/wzh/robot/models/openvla-7b",
+    "quant": "int4-nf4",
+    "unnorm_key": "pushcube_vla",
+    "action_dim": 7,
+    "prompt_template": "In: What action should the robot take to {instruction}?\\nOut:",
+    "lora": {
+      "rank": 8,
+      "alpha": 16,
+      "dropout": 0.05,
+      "target": "language_model\\.model\\.layers\\.\\d+\\.self_attn\\.(?:q_proj|v_proj)"
+    },
+    "norm_stats": {
+      "min": [
+        0.0,
+        -0.009620249271392822,
+        -0.0031751515343785286,
+        0.0
+      ],
+      "max": [
+        0.019999999552965164,
+        0.00800000037997961,
+        0.0,
+        0.0
+      ]
+    },
+    "learning_rate": 0.0002,
+    "max_grad_norm": 1.0,
+    "kind": "best_by_eval_loss",
+    "eval_loss": 1.966658,
+    "epoch": 0.7596,
+    "global_step": 192
+  },
+  "tuned_best": {
+    "model_dir": "/data/wzh/robot/models/openvla-7b",
+    "quant": "int4-nf4",
+    "unnorm_key": "pushcube_vla",
+    "action_dim": 7,
+    "prompt_template": "In: What action should the robot take to {instruction}?\\nOut:",
+    "lora": {
+      "rank": 8,
+      "alpha": 16,
+      "dropout": 0.05,
+      "target": "language_model\\.model\\.layers\\.\\d+\\.self_attn\\.(?:q_proj|v_proj)"
+    },
+    "norm_stats": {
+      "min": [
+        0.0,
+        -0.009620249271392822,
+        -0.0031751515343785286,
+        0.0
+      ],
+      "max": [
+        0.019999999552965164,
+        0.00800000037997961,
+        0.0,
+        0.0
+      ]
+    },
+    "learning_rate": 0.0001,
+    "max_grad_norm": 1.0,
+    "kind": "best_by_eval_loss",
+    "eval_loss": 1.988962,
+    "epoch": 0.7596,
+    "global_step": 192
+  },
+  "conclusion": {
+    "baseline_eval_seq": [
+      2.0503,
+      2.0717,
+      1.9667,
+      2.3424
+    ],
+    "tuned_eval_seq": [
+      2.7561,
+      2.0638,
+      1.989,
+      2.01
+    ],
+    "baseline_rebound_pct": 19.1,
+    "tuned_rebound_pct": 1.1,
+    "decision": "lr 降至 1e-4 + 梯度裁剪 1.0 后，epoch 末 eval_loss 回升从 19% 降至 1.1%，震荡显著改善"
+  }
+}
