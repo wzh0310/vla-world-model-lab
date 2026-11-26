@@ -188,6 +188,25 @@ MUJOCO_GL=egl /opt/miniconda3/envs/mujoco/bin/python scripts/collect_vla_demos.p
 
 详见 `docs/VLA数据预处理与标准化.md`。
 
+### LeRobot 格式适配与验证
+
+预处理数据集已转换为 LeRobot v0.7.0 Parquet 格式，可由官方接口直接加载：
+
+```bash
+/opt/miniconda3/envs/lerobot/bin/python scripts/convert_to_lerobot.py
+/opt/miniconda3/envs/lerobot/bin/python scripts/verify_lerobot_dataset.py \
+  --root /data/wzh/robot/datasets/vla_pushcube_25/lerobot
+```
+
+- 字段：`episode_index` / `frame_index` / `timestamp` / `observation.images.main` /
+  `observation.language_instruction` / `action`，加官方自动注入的 `index` / `task_index` / `task`。
+- 训练 / 验证各建独立库：20 回合 745 帧 / 5 回合 183 帧，图像内联存 Parquet（`use_videos=False`）。
+- 官方 `frame_index` / `timestamp` **每回合从 0 重排**（非全局递增），步长 1/50；回合级指令帧内唯一。
+- `scripts/verify_lerobot_dataset.py` 42 项校验全通过（Parquet 列级时序 + 官方接口抽样解码）。
+- 抽检图 `results/vla_dataset/lerobot_sample_grid.png` 确认 RGB 与图文对齐保真。
+
+详见 `docs/VLA的LeRobot格式适配与验证.md`。
+
 ## 已知限制与下一步
 
 1. 零样本无法完成任务，需用上述域内数据做 LoRA 微调（配置见 `docs/LoRA微调配置与数据集字段规范.md`）；

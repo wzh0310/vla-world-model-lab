@@ -247,6 +247,22 @@ $VLA scripts/verify_vla_preprocess.py --root /data/wzh/robot/datasets/vla_pushcu
 模型 `preprocessor_config.json`：DINOv2 视图用 ImageNet mean/std、SigLIP 视图用 0.5；
 Dataset 按索引返回双视图张量 + 完整 prompt。详见 `docs/VLA数据预处理与标准化.md`。
 
+LeRobot v0.7.0 格式适配（转 Parquet 并用官方接口验证）：
+
+```bash
+# lerobot 环境运行
+LEROBOT=/opt/miniconda3/envs/lerobot/bin/python
+$LEROBOT scripts/convert_to_lerobot.py \
+  --src /data/wzh/robot/datasets/vla_pushcube_25/preprocessed \
+  --out /data/wzh/robot/datasets/vla_pushcube_25/lerobot
+$LEROBOT scripts/verify_lerobot_dataset.py --root /data/wzh/robot/datasets/vla_pushcube_25/lerobot
+```
+
+字段严格对齐官方规范（`episode_index`/`frame_index`/`timestamp`/`observation.images.main`/
+`observation.language_instruction`/`action` + 自动注入的 `index`/`task_index`/`task`）。
+训练/验证各建独立库（20 回合 745 帧 / 5 回合 183 帧），42 项校验全通过；
+注意官方 `frame_index`/`timestamp` 每回合从 0 重排。详见 `docs/VLA的LeRobot格式适配与验证.md`。
+
 ### 5.2 数据准备
 
 数据集不入库，可用两种方式获得：
