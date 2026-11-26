@@ -20,6 +20,7 @@ vla/
 │   ├── infer_vla_action_for_mujoco.py# 单步推理与动作映射
 │   ├── apply_vla_action_to_mujoco.py # 单步动作执行（mujoco 环境）
 │   ├── rollout_vla_closed_loop.py    # 回合级闭环推理
+│   ├── inference.py                  # 单样本推理 + 动作幅度/方向验证（int4 默认）
 │   └── plot_closed_loop.py           # 闭环结果可视化
 ├── utils/
 │   └── vla_adapter.py        # 图像预处理 / 动作映射 / 结果解析 / 模型封装
@@ -89,7 +90,25 @@ cd $R
 
 闭环采用**单进程注入**方案：`vla` 进程内注入 `mujoco` 环境 site-packages，模型只加载一次、环境全程驻留。两环境 `torch==2.6.0+cu124` / `numpy==2.5.5` 版本一致，无 ABI 冲突。
 
-### 5. 用兼容入口（旧命令）
+### 5. 单样本推理（int4 低显存）
+
+```bash
+# 用已保存的单帧图像 + 初始状态复现
+/opt/miniconda3/envs/vla/bin/python vla/inference/inference.py \
+  --quant int4 \
+  --image results/vla_single_step/observation_224.png \
+  --state results/vla_single_step/initial_state.npz \
+  --instruction "push the cube to the red target"
+
+# 实时取图必须先设置 EGL，否则脚本会拦截全零占位图像
+MUJOCO_GL=egl /opt/miniconda3/envs/vla/bin/python vla/inference/inference.py \
+  --quant int4 --instruction "push the cube to the red target"
+```
+
+实测 int4 显存保留 4.823 GB（≤8 GB），动作落在环境量程内、方向余弦 0.8838；
+详见 `docs/OpenVLA轻量化推理与零样本基线.md`。
+
+### 6. 用兼容入口（旧命令）
 
 ```bash
 /opt/miniconda3/envs/vla/bin/python scripts/rollout_vla_closed_loop.py --help
@@ -110,7 +129,12 @@ OpenVLA 输出 7 维末端增量，PushCube 只接受 4 维动作，映射分四
 
 ## 测试结果
 
-三条指令各 30 步（A6000，bf16，相同初始状态，立方体起点 `[0.62,-0.12]`、目标 `[0.82,-0.12]`）：
+**先说明一处判据修正**：下表是早期 bf16 运行记录，当时未设置 `MUJOCO_GL=egl`，
+环境返回的 `obs["image"]` 实际是全零占位，因此它不是有效的视觉零样本基线。
+修正后的有效基线见 `docs/OpenVLA轻量化推理与零样本基线.md`（int4 + EGL，真实图像，
+同为 0/3）。下表仅保留为历史性能参考，其中的语言条件差异结论不再作为视觉证据。
+
+早期 bf16 记录：三条指令各 30 步（A6000，相同初始状态，立方体起点 `[0.62,-0.12]`、目标 `[0.82,-0.12]`）：
 
 | 指令 | 距离变化 | 总奖励 | 平均单步耗时 |
 |---|---|---|---|
