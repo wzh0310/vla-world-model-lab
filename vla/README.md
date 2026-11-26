@@ -207,6 +207,26 @@ MUJOCO_GL=egl /opt/miniconda3/envs/mujoco/bin/python scripts/collect_vla_demos.p
 
 详见 `docs/VLA的LeRobot格式适配与验证.md`。
 
+### 数据集质量优化与增强（v1.0）
+
+```bash
+/opt/miniconda3/envs/vla/bin/python scripts/audit_vla_quality.py
+/opt/miniconda3/envs/vla/bin/python scripts/augment_vla_dataset.py
+/opt/miniconda3/envs/vla/bin/python scripts/generate_vla_stats_report.py
+/opt/miniconda3/envs/vla/bin/python scripts/verify_vla_v1.py
+```
+
+- 质量抽查：随机 3 条轨迹逐帧核对，指令一致 / 帧连续 / 物理跳变 ≤0.02m 量程 / 无模糊帧。
+  初判据按归一化跳变误报，反归一化到物理量后确认是 min-max 映射假象，判据已修正。
+- 图像增强（仅训练集）：亮度 U(0.85,1.15) + 对比度 U(0.85,1.15) + 高斯噪声 sigma U(0,0.02)，
+  每条轨迹参数固定保证帧内一致；实测像素差 0.0647。
+- 指令增强：20 模板各 2 条语义等价改写，同轨迹多表述提升语言泛化。
+- v1.0 规模：训练集 20 源轨迹 → 80 块 / 2980 帧；验证集 5 条 183 帧不变（基线）。
+- 统计报告 `results/vla_dataset/stats_report_v1.md`（轨迹/帧数/指令分布/动作范围/验证集基线），
+  `scripts/verify_vla_v1.py` 19 项校验全通过。
+
+详见 `docs/VLA数据集质量优化与增强.md`。
+
 ## 已知限制与下一步
 
 1. 零样本无法完成任务，需用上述域内数据做 LoRA 微调（配置见 `docs/LoRA微调配置与数据集字段规范.md`）；

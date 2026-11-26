@@ -263,6 +263,21 @@ $LEROBOT scripts/verify_lerobot_dataset.py --root /data/wzh/robot/datasets/vla_p
 训练/验证各建独立库（20 回合 745 帧 / 5 回合 183 帧），42 项校验全通过；
 注意官方 `frame_index`/`timestamp` 每回合从 0 重排。详见 `docs/VLA的LeRobot格式适配与验证.md`。
 
+数据集质量优化与增强（v1.0，仅训练集增强）：
+
+```bash
+$VLA scripts/audit_vla_quality.py                 # 质量抽查（3 条轨迹逐帧核对）
+$VLA scripts/augment_vla_dataset.py               # 生成 v1.0（图像+指令增强）
+$VLA scripts/generate_vla_stats_report.py         # 统计报告
+$VLA scripts/verify_vla_v1.py                     # 校验（19/19）
+```
+
+质量抽查 3 条轨迹全 PASS（指令/帧连续/物理跳变在量程内/无模糊）；图像增强
+（亮度/对比度/高斯噪声，帧内参数一致）+ 每条轨迹 2 条同义指令 → 训练集
+20 条扩为 80 块 / 2980 帧，验证集 5 条 183 帧保持不变作基线。
+统计报告 `results/vla_dataset/stats_report_v1.md`，19 项校验全通过。
+详见 `docs/VLA数据集质量优化与增强.md`。
+
 ### 5.2 数据准备
 
 数据集不入库，可用两种方式获得：
