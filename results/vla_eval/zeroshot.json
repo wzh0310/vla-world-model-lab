@@ -1,0 +1,215 @@
+{
+  "mode": "zero-shot",
+  "unnorm_key": "bridge_orig",
+  "adapter": null,
+  "config": {
+    "max_steps": 40,
+    "scale_m": 0.02,
+    "episodes_per_instruction": 3,
+    "seed_base": 100
+  },
+  "episodes": [
+    {
+      "instruction": "push the cube to the red target",
+      "seed": 100,
+      "dist_start": 0.2,
+      "dist_end": 0.2,
+      "dist_min": 0.2,
+      "dist_improvement": -0.0,
+      "success": false,
+      "steps": 40,
+      "wall_time_s": 43.03
+    },
+    {
+      "instruction": "push the cube to the red target",
+      "seed": 101,
+      "dist_start": 0.2,
+      "dist_end": 0.2,
+      "dist_min": 0.2,
+      "dist_improvement": -0.0,
+      "success": false,
+      "steps": 40,
+      "wall_time_s": 41.17
+    },
+    {
+      "instruction": "push the cube to the red target",
+      "seed": 102,
+      "dist_start": 0.2,
+      "dist_end": 0.2,
+      "dist_min": 0.2,
+      "dist_improvement": -0.0,
+      "success": false,
+      "steps": 40,
+      "wall_time_s": 40.75
+    },
+    {
+      "instruction": "push the cube into the red marked area",
+      "seed": 200,
+      "dist_start": 0.2,
+      "dist_end": 0.2,
+      "dist_min": 0.2,
+      "dist_improvement": 0.0,
+      "success": false,
+      "steps": 40,
+      "wall_time_s": 40.79
+    },
+    {
+      "instruction": "push the cube into the red marked area",
+      "seed": 201,
+      "dist_start": 0.2,
+      "dist_end": 0.2,
+      "dist_min": 0.2,
+      "dist_improvement": 0.0,
+      "success": false,
+      "steps": 40,
+      "wall_time_s": 40.6
+    },
+    {
+      "instruction": "push the cube into the red marked area",
+      "seed": 202,
+      "dist_start": 0.2,
+      "dist_end": 0.2,
+      "dist_min": 0.2,
+      "dist_improvement": 0.0,
+      "success": false,
+      "steps": 40,
+      "wall_time_s": 40.73
+    },
+    {
+      "instruction": "move block to red target",
+      "seed": 300,
+      "dist_start": 0.2,
+      "dist_end": 0.2,
+      "dist_min": 0.2,
+      "dist_improvement": -0.0,
+      "success": false,
+      "steps": 40,
+      "wall_time_s": 40.43
+    },
+    {
+      "instruction": "move block to red target",
+      "seed": 301,
+      "dist_start": 0.2,
+      "dist_end": 0.2,
+      "dist_min": 0.2,
+      "dist_improvement": -0.0,
+      "success": false,
+      "steps": 40,
+      "wall_time_s": 40.56
+    },
+    {
+      "instruction": "move block to red target",
+      "seed": 302,
+      "dist_start": 0.2,
+      "dist_end": 0.2,
+      "dist_min": 0.2,
+      "dist_improvement": -0.0,
+      "success": false,
+      "steps": 40,
+      "wall_time_s": 40.61
+    },
+    {
+      "instruction": "slide the cube ahead to the red goal",
+      "seed": 400,
+      "dist_start": 0.2,
+      "dist_end": 0.2,
+      "dist_min": 0.2,
+      "dist_improvement": 0.0,
+      "success": false,
+      "steps": 40,
+      "wall_time_s": 39.75
+    },
+    {
+      "instruction": "slide the cube ahead to the red goal",
+      "seed": 401,
+      "dist_start": 0.2,
+      "dist_end": 0.2,
+      "dist_min": 0.2,
+      "dist_improvement": 0.0,
+      "success": false,
+      "steps": 40,
+      "wall_time_s": 39.93
+    },
+    {
+      "instruction": "slide the cube ahead to the red goal",
+      "seed": 402,
+      "dist_start": 0.2,
+      "dist_end": 0.2,
+      "dist_min": 0.2,
+      "dist_improvement": 0.0,
+      "success": false,
+      "steps": 40,
+      "wall_time_s": 40.14
+    },
+    {
+      "instruction": "push the block onto the red disc",
+      "seed": 500,
+      "dist_start": 0.2,
+      "dist_end": 0.2,
+      "dist_min": 0.2,
+      "dist_improvement": -0.0,
+      "success": false,
+      "steps": 40,
+      "wall_time_s": 41.98
+    },
+    {
+      "instruction": "push the block onto the red disc",
+      "seed": 501,
+      "dist_start": 0.2,
+      "dist_end": 0.2,
+      "dist_min": 0.2,
+      "dist_improvement": -0.0,
+      "success": false,
+      "steps": 40,
+      "wall_time_s": 40.18
+    },
+    {
+      "instruction": "push the block onto the red disc",
+      "seed": 502,
+      "dist_start": 0.2,
+      "dist_end": 0.2,
+      "dist_min": 0.2,
+      "dist_improvement": -0.0,
+      "success": false,
+      "steps": 40,
+      "wall_time_s": 40.2
+    }
+  ],
+  "per_instruction": {
+    "push the cube to the red target": {
+      "episodes": 3,
+      "successes": 0,
+      "success_rate": 0.0,
+      "mean_dist_improvement": 0.0
+    },
+    "push the cube into the red marked area": {
+      "episodes": 3,
+      "successes": 0,
+      "success_rate": 0.0,
+      "mean_dist_improvement": 0.0
+    },
+    "move block to red target": {
+      "episodes": 3,
+      "successes": 0,
+      "success_rate": 0.0,
+      "mean_dist_improvement": 0.0
+    },
+    "slide the cube ahead to the red goal": {
+      "episodes": 3,
+      "successes": 0,
+      "success_rate": 0.0,
+      "mean_dist_improvement": 0.0
+    },
+    "push the block onto the red disc": {
+      "episodes": 3,
+      "successes": 0,
+      "success_rate": 0.0,
+      "mean_dist_improvement": 0.0
+    }
+  },
+  "total_episodes": 15,
+  "total_successes": 0,
+  "success_rate": 0.0,
+  "mean_dist_improvement": 0.0,
+  "total_wall_s": 613.12
+}

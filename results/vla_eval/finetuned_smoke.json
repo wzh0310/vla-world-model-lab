@@ -1,0 +1,48 @@
+{
+  "mode": "finetuned",
+  "unnorm_key": "pushcube_vla",
+  "adapter": "results/vla_finetune_tuned/best_adapter",
+  "config": {
+    "max_steps": 40,
+    "scale_m": 0.02,
+    "episodes_per_instruction": 2,
+    "seed_base": 100
+  },
+  "episodes": [
+    {
+      "instruction": "push the cube to the red target",
+      "seed": 100,
+      "dist_start": 0.2,
+      "dist_end": 0.325058,
+      "dist_min": 0.09541,
+      "dist_improvement": -0.125058,
+      "success": false,
+      "steps": 36,
+      "wall_time_s": 40.16
+    },
+    {
+      "instruction": "push the cube to the red target",
+      "seed": 101,
+      "dist_start": 0.2,
+      "dist_end": 0.325058,
+      "dist_min": 0.09541,
+      "dist_improvement": -0.125058,
+      "success": false,
+      "steps": 36,
+      "wall_time_s": 39.5
+    }
+  ],
+  "per_instruction": {
+    "push the cube to the red target": {
+      "episodes": 2,
+      "successes": 0,
+      "success_rate": 0.0,
+      "mean_dist_improvement": -0.125058
+    }
+  },
+  "total_episodes": 2,
+  "total_successes": 0,
+  "success_rate": 0.0,
+  "mean_dist_improvement": -0.125058,
+  "total_wall_s": 80.09
+}
