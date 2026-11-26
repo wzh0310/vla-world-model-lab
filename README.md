@@ -223,7 +223,14 @@ MUJOCO_GL=egl $MUJOCO scripts/collect_vla_demos.py --episodes 180 --select 25 \
 $VLA scripts/verify_vla_dataset.py --root /data/wzh/robot/datasets/vla_pushcube_25
 # 可视化抽检 -> results/vla_dataset/vla_dataset_grid.png
 $VLA scripts/visualize_vla_dataset.py
+# 语言指令标注 + 三元组配对（回合级指令，指令与轨迹一一对应）
+$VLA scripts/build_vla_triplets.py --raw /data/wzh/robot/datasets/vla_pushcube_25/raw_demos_vla.npz \
+  --out /data/wzh/robot/datasets/vla_pushcube_25/triplets
+$VLA scripts/verify_vla_triplets.py --root /data/wzh/robot/datasets/vla_pushcube_25/triplets
 ```
+
+标注后得到带语言标注的中间数据集（25 个独立三元组 + 全局 npz + 索引表 JSON/CSV），
+采用**回合级指令**：一条指令对应整段轨迹、帧内共享。详见 `docs/VLA语言指令标注与三元组配对.md`。
 
 ### 5.2 数据准备
 

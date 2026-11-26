@@ -149,6 +149,22 @@ MUJOCO_GL=egl /opt/miniconda3/envs/mujoco/bin/python scripts/collect_vla_demos.p
 采集复用既有 `collect_demos_v3.py` 的专家控制律，新增起点大幅随机化、时间戳、指令分配与穿模筛选。
 完整设计与字段规范见 `docs/VLA数据集方案与指令模板库.md` 与 `docs/LoRA微调配置与数据集字段规范.md`。
 
+### 三元组标注（回合级指令）
+
+原始轨迹已配对为完整三元组「指令文本 - 图像序列 - 动作序列」，采用**回合级指令**：
+单条指令对应整段轨迹、帧内所有帧共享，而非逐帧更换。
+
+```bash
+/opt/miniconda3/envs/vla/bin/python scripts/build_vla_triplets.py
+/opt/miniconda3/envs/vla/bin/python scripts/verify_vla_triplets.py \
+  --root /data/wzh/robot/datasets/vla_pushcube_25/triplets
+```
+
+产出落在仓库外 `triplets/`：25 个独立三元组 npz（一对一）+ 全局 npz + 索引表
+（JSON/CSV，含 episode_id / 指令 / 轨迹长度 / 动作维度）+ tasks.jsonl。
+校验全部 PASS（一一对应、回合级一致、索引一致）。详见
+`docs/VLA语言指令标注与三元组配对.md`。
+
 ## 已知限制与下一步
 
 1. 零样本无法完成任务，需用上述域内数据做 LoRA 微调（配置见 `docs/LoRA微调配置与数据集字段规范.md`）；
