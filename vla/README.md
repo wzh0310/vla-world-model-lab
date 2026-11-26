@@ -24,7 +24,8 @@ vla/
 ├── utils/
 │   └── vla_adapter.py        # 图像预处理 / 动作映射 / 结果解析 / 模型封装
 ├── data/
-│   └── instruction_templates.py  # 5 类 20 条指令模板库与均衡分配
+│   ├── instruction_templates.py  # 5 类 20 条指令模板库与均衡分配
+│   └── pushcube_dataset.py       # PyTorch Dataset：按索引读单帧三元组 + 双视图
 └── configs/
     ├── openvla.yaml          # 模型与推理参数、实测性能基线、依赖锁定
     └── pushcube_action.yaml  # 动作空间与映射口径
@@ -164,6 +165,28 @@ MUJOCO_GL=egl /opt/miniconda3/envs/mujoco/bin/python scripts/collect_vla_demos.p
 （JSON/CSV，含 episode_id / 指令 / 轨迹长度 / 动作维度）+ tasks.jsonl。
 校验全部 PASS（一一对应、回合级一致、索引一致）。详见
 `docs/VLA语言指令标注与三元组配对.md`。
+
+### 数据预处理与标准化
+
+把三元组处理为完全匹配 OpenVLA 输入输出的格式，产出可被 DataLoader 加载的数据集：
+
+```bash
+/opt/miniconda3/envs/vla/bin/python scripts/preprocess_vla_data.py
+/opt/miniconda3/envs/vla/bin/python scripts/verify_vla_preprocess.py \
+  --root /data/wzh/robot/datasets/vla_pushcube_25/preprocessed
+```
+
+- 图像：resize 224×224（bicubic）、RGB/CHW、像素 /255 到 [0,1]；按模型
+  `preprocessor_config.json` 实读的双主干口径，在 Dataset 内派生 DINOv2（ImageNet
+  mean/std）与 SigLIP（0.5）两个视图。
+- 动作：4 维增量 min-max 归一化到 [-1,1]，min/max 落盘 `norm_stats.json`，
+  微调与推理共用同一份；gripper 为常量维单独标记，反归一化误差 9.21e-11。
+- 划分：按指令类别分层，5 类各取 1 条做验证 → 20 训练 / 5 验证（745 / 183 帧），
+  类别分布一致且可复现。
+- `PushCubeFrameDataset`（`vla/data/pushcube_dataset.py`）按索引返回
+  image / 双视图 / action / instruction / prompt / episode_id 等字段，28 项校验全通过。
+
+详见 `docs/VLA数据预处理与标准化.md`。
 
 ## 已知限制与下一步
 

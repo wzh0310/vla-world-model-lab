@@ -148,7 +148,7 @@ vla-world-model-lab/
 ├── vla/                    # VLA 推理模块 v0.1（详见 vla/README.md）
 │   ├── inference/          # OpenVLA 推理脚本（验证 / 单步 / 闭环 / 可视化）
 │   ├── utils/              # 图像预处理、动作映射、模型封装工具
-│   ├── data/               # 指令模板库（5 类 20 条）与数据方案配套工具
+│   ├── data/               # 指令模板库（5 类 20 条）+ PyTorch Dataset 类
 │   └── configs/            # 模型参数与动作空间 YAML
 ├── results/                # 实验结果、图表、演示视频（入库）
 ├── demos/                  # 关键场景截图与演示素材（入库）
@@ -231,6 +231,21 @@ $VLA scripts/verify_vla_triplets.py --root /data/wzh/robot/datasets/vla_pushcube
 
 标注后得到带语言标注的中间数据集（25 个独立三元组 + 全局 npz + 索引表 JSON/CSV），
 采用**回合级指令**：一条指令对应整段轨迹、帧内共享。详见 `docs/VLA语言指令标注与三元组配对.md`。
+
+数据预处理与标准化（匹配 OpenVLA 输入口径，产出 DataLoader 可直接加载的数据集）：
+
+```bash
+# 图像 resize 224 + RGB/CHW + [0,1]；动作 min-max -> [-1,1]；类别分层 20/5
+$VLA scripts/preprocess_vla_data.py \
+  --src /data/wzh/robot/datasets/vla_pushcube_25/triplets \
+  --out /data/wzh/robot/datasets/vla_pushcube_25/preprocessed
+$VLA scripts/verify_vla_preprocess.py --root /data/wzh/robot/datasets/vla_pushcube_25/preprocessed
+```
+
+产出 `train.npz`（20 条 / 745 帧）、`val.npz`（5 条 / 183 帧）、`norm_stats.json`
+（动作 min/max、图像双视图 mean/std）、`splits.json`。像素与动作归一化口径实读自
+模型 `preprocessor_config.json`：DINOv2 视图用 ImageNet mean/std、SigLIP 视图用 0.5；
+Dataset 按索引返回双视图张量 + 完整 prompt。详见 `docs/VLA数据预处理与标准化.md`。
 
 ### 5.2 数据准备
 
