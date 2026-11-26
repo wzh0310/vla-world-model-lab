@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Day 1 基础验证：WorldModel.rollout() 多步预测管线端到端测试。
+"""基础验证：WorldModel.rollout() 多步预测管线端到端测试。
 
 读取 1 条专家轨迹：前 K 帧真实图像 + 对应动作做后验热身，再用后续 N 步动作
 开环想象，输出 10 步预测帧序列，与真实帧逐 step 对齐计算 PSNR / SSIM，
