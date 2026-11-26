@@ -1,0 +1,48 @@
+# ============================================================================
+# OpenVLA LoRA 微调配置（PushCube v1.0 数据集）
+# ----------------------------------------------------------------------------
+# 所有动作口径与 vla/configs/pushcube_action.yaml、v1.0/norm_stats.json 对齐。
+# 命令行参数可覆盖本文件默认值；--smoke 仅跑一步贯通验证。
+# ============================================================================
+
+paths:
+  model_dir: /data/wzh/robot/models/openvla-7b
+  train_npz: /data/wzh/robot/datasets/vla_pushcube_25/v1.0/train_v1.npz
+  val_npz: /data/wzh/robot/datasets/vla_pushcube_25/v1.0/val_v1.npz
+  norm_stats: /data/wzh/robot/datasets/vla_pushcube_25/v1.0/norm_stats.json
+  out_dir: /data/wzh/robot/vla-world-model-lab/results/vla_finetune
+  run_name: pushcube_lora_v1
+
+action:
+  action_dim: 7              # OpenVLA [dx,dy,dz,drx,dry,drz,gripper]
+  source_action_dim: 4       # 数据集 [dx,dy,dz,gripper]
+  unnorm_key: pushcube_vla   # 注册进模型 norm_stats，推理须用同名 key
+
+lora:
+  lora_rank: 32
+  lora_alpha: 16
+  lora_dropout: 0.0
+
+optim:
+  learning_rate: 0.0005
+  weight_decay: 0.0
+  epochs: 3
+  max_steps: -1              # -1 = 按 epochs 跑满
+  batch_size: 2
+  grad_accumulation_steps: 1 # 等效 batch 2；A6000 48G 可提到 8 + 累积 2
+  max_grad_norm: 1.0
+  lr_scheduler: constant
+  warmup_steps: 0
+
+runtime:
+  gradient_checkpointing: true
+  seed: 20261126
+  device: cuda:0
+  dtype: bfloat16            # 不做量化（QLoRA 掉精度）
+  num_workers: 0
+
+log:
+  log_every: 10
+  eval_every: 100
+  save_steps: -1
+  val_max_batches: -1

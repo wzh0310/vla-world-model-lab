@@ -58,7 +58,7 @@
 v1.0/
 ├── train_v1.npz            # 20 源轨迹 -> 80 块 / 2980 帧（含 aug_type 等追踪字段）
 ├── val_v1.npz              # 5 条 / 183 帧（与基线逐字节一致）
-├── norm_stats.json         # 复用 Day11 归一化参数
+├── norm_stats.json         # 复用前期预处理阶段的归一化参数
 ├── augmentation_summary.json
 ├── stats_report.json
 ├── verify_result.json      # status: PASS, 19/19

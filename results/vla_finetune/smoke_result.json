@@ -1,0 +1,19 @@
+{
+  "mode": "smoke",
+  "train": {
+    "loss": 9.533400535583496,
+    "grad_norm": 13.0,
+    "lr": 0.0005,
+    "step": 1
+  },
+  "val": {
+    "val_loss": 10.842019081115723,
+    "token_accuracy": 0.14285714285714285,
+    "batches": 1,
+    "tokens": 14
+  },
+  "tokenizer_roundtrip_error": 0.0019607843137254832,
+  "adapter": "/data/wzh/robot/vla-world-model-lab/results/vla_finetune/checkpoint-0",
+  "gpu_memory_reserved_gb": 15.465,
+  "elapsed_s": 24.05
+}

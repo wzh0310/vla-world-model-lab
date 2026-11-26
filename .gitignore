@@ -5,3 +5,5 @@ __pycache__/
 checkpoints/
 outputs/
 wandb/
+results/vla_finetune/checkpoint-*/
+*.safetensors

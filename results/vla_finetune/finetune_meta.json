@@ -1,0 +1,43 @@
+{
+  "model_dir": "/data/wzh/robot/models/openvla-7b",
+  "unnorm_key": "pushcube_vla",
+  "action_dim": 7,
+  "source_action_dim": 4,
+  "n_action_bins": 256,
+  "vocab_size": 32000,
+  "norm_stats_entry": {
+    "q01": [
+      0.0,
+      -0.005846207030117512,
+      -0.0031751515343785286,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "q99": [
+      0.019999999552965164,
+      0.004999999888241291,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "mask": [
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "lora": {
+    "rank": 32,
+    "alpha": 16,
+    "dropout": 0.0,
+    "target_modules": "language_model\\.model\\.layers\\.\\d+\\.(?:self_attn\\.(?:q_proj|k_proj|v_proj|o_proj)|mlp\\.(?:gate_proj|up_proj|down_proj))"
+  }
+}
