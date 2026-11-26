@@ -251,9 +251,27 @@ MUJOCO_GL=egl /opt/miniconda3/envs/mujoco/bin/python scripts/collect_vla_demos.p
 
 详见 `docs/VLA数据集质量优化与增强.md`。
 
+### Trainer 版 QLoRA 微调脚本
+
+基于 `transformers.Trainer` 的微调主脚本已就绪，严格复用官方 prompt 模板：
+
+```bash
+# 小样本贯通（1% 数据，观察 loss 下降）
+/opt/miniconda3/envs/vla/bin/python src/vla_finetune/train.py \
+  --config vla/configs/trainer_lora.yaml --smoke --smoke-warmup 2 --smoke-steps 20
+# 完整训练（rank8/alpha16/dropout0.05，lr2e-4，bs4×accum4，10 epoch，warmup50）
+/opt/miniconda3/envs/vla/bin/python src/vla_finetune/train.py \
+  --config vla/configs/trainer_lora.yaml
+```
+
+- 4bit NF4 量化加载，冻结底座与视觉塔，只对语言主干 `q_proj/v_proj` 挂 LoRA；
+- 动作归一化/反归一化工具见 `src/vla_finetune/action_utils.py`，数据管线见 `trainer_data.py`；
+- 小样本实测 loss 12.8332 → 2.4911（20 步），仅为管线贯通与趋势验证；
+- 详见 `docs/Trainer版QLoRA微调脚本开发.md` 与 `results/vla_finetune_trainer/trainer_smoke_result.json`。
+
 ## 已知限制与下一步
 
-1. 零样本无法完成任务，需用上述域内数据做 LoRA 微调（配置见 `docs/LoRA微调配置与数据集字段规范.md`）；
+1. 零样本无法完成任务，需用上述域内数据做 LoRA 微调（Trainer 脚本见上；早期骨架见 `docs/LoRA微调配置与数据集字段规范.md`）；
 2. 推理速度瓶颈在自回归生成 7 个动作 token（约 3.4 Hz），换流匹配模型（π0 / SmolVLA）可提升吞吐；
 3. 单步闭环使用跨本体启发式映射，非物理标定；微调阶段应改用真实动作空间对齐；
 4. 数据集为脚本化专家轨迹、夹爪恒为 0（推物任务无需抓取）；扩维到 7 维时旋转补 0、夹爪二值化。

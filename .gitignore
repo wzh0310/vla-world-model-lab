@@ -7,3 +7,8 @@ outputs/
 wandb/
 results/vla_finetune/checkpoint-*/
 *.safetensors
+
+# Trainer 微调产物：大权重与分词器不入库，仅保留 JSON 结果
+results/vla_finetune_trainer/smoke_adapter/
+results/vla_finetune_trainer/adapter/
+results/vla_finetune_trainer/trainer_ckpt/

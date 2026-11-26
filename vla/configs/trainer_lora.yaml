@@ -1,0 +1,35 @@
+# ============================================================================
+# OpenVLA QLoRA 微调配置（Trainer API 版）
+# ----------------------------------------------------------------------------
+# 4bit 量化 + LoRA(q_proj/v_proj) + 官方 prompt 模板；动作口径与数据集 v1.0 一致。
+# ============================================================================
+
+paths:
+  model_dir: /data/wzh/robot/models/openvla-7b
+  hf_dataset: /data/wzh/robot/datasets/vla_pushcube_finetune/hf_dataset
+  norm_stats: /data/wzh/robot/datasets/vla_pushcube_finetune/hf_dataset/norm_stats.json
+  out_dir: /data/wzh/robot/vla-world-model-lab/results/vla_finetune_trainer
+
+action:
+  action_dim: 7              # OpenVLA 7 维
+  source_action_dim: 4       # 数据集 4 维 [dx,dy,dz,gripper]
+  unnorm_key: pushcube_vla   # 与推理共用；注册进 config.norm_stats
+
+lora:
+  lora_rank: 8
+  lora_alpha: 16
+  lora_dropout: 0.05
+
+optim:
+  learning_rate: 0.0002      # 2e-4
+  weight_decay: 0.0
+  epochs: 10
+  batch_size: 4
+  grad_accum: 4              # 等效 batch 16
+  max_grad_norm: 1.0
+  warmup_steps: 50
+  lr_scheduler: linear
+
+runtime:
+  seed: 42
+  device: cuda:0
