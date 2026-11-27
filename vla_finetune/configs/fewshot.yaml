@@ -1,0 +1,41 @@
+# ============================================================================
+# 少样本跨任务续训配置
+# ----------------------------------------------------------------------------
+# 从最优 adapter 续训：lr=2e-5、constant、60 步、eval_steps 设超大值跳过训练中评估，
+# 最终权重直接存入 adapter 目录。续训数据集由 --hf-dataset 指定，
+# 起点 adapter 由 --init-adapter 指定（两者均为命令行必填）。
+# ============================================================================
+
+paths:
+  model_dir: /data/wzh/robot/models/openvla-7b
+  hf_dataset: /data/wzh/robot/datasets/vla_pushcube_cross/hf_dataset
+  norm_stats: /data/wzh/robot/datasets/vla_pushcube_finetune/hf_dataset/norm_stats.json
+  out_dir: /data/wzh/robot/vla-world-model-lab/results/vla_cross_task_unified
+
+action:
+  action_dim: 7
+  source_action_dim: 4
+  unnorm_key: pushcube_vla
+
+lora:
+  lora_rank: 8
+  lora_alpha: 16
+  lora_dropout: 0.05
+
+optim:
+  learning_rate: 0.00002     # 2e-5，低学习率抑制灾难性遗忘
+  weight_decay: 0.0
+  epochs: 10
+  batch_size: 4
+  grad_accum: 4
+  max_grad_norm: 1.0
+  warmup_steps: 0
+  lr_scheduler: constant
+  eval_steps: 999999         # 跳过训练中评估，直接保存最终 adapter
+  eval_subset_size: 64
+
+runtime:
+  seed: 42
+  device: cuda:0
+
+note: "续训需 --init-adapter <最优adapter> --hf-dataset <跨任务数据集>"

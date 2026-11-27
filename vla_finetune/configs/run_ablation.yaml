@@ -1,0 +1,12 @@
+# ============================================================================
+# 一键运行配置：LoRA rank 消融（固定预算）
+# 切换 rank: --set args.lora_rank=16
+# 对照 constant-lr: --set args.lr_scheduler=constant
+# ============================================================================
+
+task: train
+entry: rank 消融预设；rank 由命令行覆盖
+args:
+  profile: ablation
+  lora_rank: 8
+  max_steps: 192

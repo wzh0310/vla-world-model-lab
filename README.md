@@ -147,10 +147,24 @@ vla-world-model-lab/
 ├── trainer/                # 训练与评估实现模块（含 metrics.py 兼容转发层）
 ├── vla/                    # VLA 推理模块 v0.1（详见 vla/README.md）
 │   ├── inference/          # OpenVLA 推理脚本（验证 / 单步 / 闭环 / 可视化）
+│   ├── eval/               # 闭环 / 泛化 / 跨任务评估 + 演示录制 + 报告绘图
 │   ├── utils/              # 图像预处理、动作映射、模型封装工具
 │   ├── data/               # 指令模板库（5 类 20 条）+ PyTorch Dataset 类
 │   └── configs/            # 模型参数与动作空间 YAML
+├── vla_finetune/           # VLA 微调统一工程门面（详见 vla_finetune/README.md）
+│   ├── train.py            # 微调主入口（配置 / 校验 / 异常处理）
+│   ├── eval.py             # 批量评估与泛化测试
+│   ├── inference.py        # 单样本推理
+│   ├── run.py              # 配置驱动一键启动
+│   ├── configs/            # 训练 / LoRA / 运行配置
+│   ├── data/               # 数据处理与格式转换
+│   └── utils/              # 动作归一化 / 可视化 / 运行时工具
 ├── results/                # 实验结果、图表、演示视频（入库）
+│   ├── vla_demo/           # 6 段真实闭环演示视频 + meta
+│   ├── vla_report_charts/  # 中文标注实验图表
+│   ├── vla_ablation/       # LoRA 秩消融
+│   ├── vla_generalization/ # 指令 / 位置泛化
+│   └── vla_cross_task/     # 少样本跨任务
 ├── demos/                  # 关键场景截图与演示素材（入库）
 ├── weights/                # 模型权重（大文件 .gitignore；获取方式见 weights/README.md）
 ├── docs/                   # 中文技术文档与面试素材
@@ -422,8 +436,13 @@ $VLA scripts/plot_sample_efficiency.py && $VLA scripts/plot_ablation.py
 | `demos/prediction/psnr_decay_base.png` | PSNR / SSIM 随步长衰减曲线 |
 | `demos/ablation/*.png` | 维度、KL、稳定性消融图表 |
 | `demos/evaluation/training_curves_full.png` | 全量训练损失与周期性 SSIM@20 曲线 |
+| `results/vla_demo/` | **VLA 演示**：6 段真实闭环 rollout（基础指令 / 3 种表述 / 位置泛化），均附 meta |
+| `results/vla_report_charts/` | VLA 实验中文图表（训练 loss 曲线 / 秩消融 / 成功率总览） |
 
-可用 `$VLA scripts/visualize_predictions.py` 重新生成同类素材。
+可用 `$VLA scripts/visualize_predictions.py` 重新生成世界模型素材；
+VLA 演示用 `$VLA vla/eval/record_demo_suite.py`，图表用
+`$VLA vla/eval/plot_report_charts.py`。完整实验结论见
+`docs/VLA微调与泛化完整实验报告.md`。
 
 ---
 

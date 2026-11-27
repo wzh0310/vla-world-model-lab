@@ -1,0 +1,11 @@
+# ============================================================================
+# 一键运行配置：闭环评估
+# 指定 adapter: --set args.adapter=<path>
+# ============================================================================
+
+task: eval
+entry: 基础闭环评估
+args:
+  suite: closed
+  adapter: results/vla_finetune_tuned/best_adapter
+  max_steps: 50

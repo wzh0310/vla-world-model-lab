@@ -1,0 +1,39 @@
+# ============================================================================
+# 微调统一默认配置（门面入口）
+# ----------------------------------------------------------------------------
+# 分节结构会被底层 load_yaml 展开为平铺键，与 src/vla_finetune/train.py 完全兼容。
+# 动作口径与推理共用：unnorm_key=pushcube_vla，禁止沿用 bridge_orig。
+# 命令行可覆盖任意字段（python vla_finetune/train.py --lora-rank 16 ...）。
+# ============================================================================
+
+paths:
+  model_dir: /data/wzh/robot/models/openvla-7b
+  hf_dataset: /data/wzh/robot/datasets/vla_pushcube_finetune/hf_dataset
+  norm_stats: /data/wzh/robot/datasets/vla_pushcube_finetune/hf_dataset/norm_stats.json
+  out_dir: /data/wzh/robot/vla-world-model-lab/results/vla_finetune_unified
+
+action:
+  action_dim: 7              # OpenVLA 7 维 [dx,dy,dz,drx,dry,drz,gripper]
+  source_action_dim: 4       # 数据集 4 维 [dx,dy,dz,gripper]
+  unnorm_key: pushcube_vla   # 注册进 norm_stats；推理须用同名 key
+
+lora:
+  lora_rank: 8
+  lora_alpha: 16             # alpha/r=2，消融时保持缩放恒定
+  lora_dropout: 0.05
+
+optim:
+  learning_rate: 0.0002
+  weight_decay: 0.0
+  epochs: 10
+  batch_size: 4
+  grad_accum: 4              # 等效 batch 16
+  max_grad_norm: 1.0
+  warmup_steps: 50
+  lr_scheduler: linear
+  eval_steps: 64
+  eval_subset_size: 128
+
+runtime:
+  seed: 42
+  device: cuda:0

@@ -1,0 +1,178 @@
+{
+  "adapter": "results/vla_finetune_tuned/best_adapter",
+  "unnorm_key": "pushcube_vla",
+  "success_radius_m": 0.03,
+  "n_clips": 6,
+  "success_count": 6,
+  "clips": [
+    {
+      "tag": "basic_instruction_0_037",
+      "kind": "instruction",
+      "scene_id": 0,
+      "instruction": "push the cube into the red marked area",
+      "instruction_zh": "基础：标准指令完成推物",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ],
+      "adapter": "results/vla_finetune_tuned/best_adapter",
+      "unnorm_key": "pushcube_vla",
+      "dist_start": 0.2,
+      "dist_end": 0.02651,
+      "dist_min": 0.02651,
+      "success": true,
+      "steps": 31,
+      "frames": 32,
+      "fps": 10,
+      "duration_s": 3.2,
+      "wall_time_s": 46.02,
+      "video": "results/vla_demo/basic_instruction_0_037/demo.mp4",
+      "video_size_mb": 0.04
+    },
+    {
+      "tag": "instruction_instruction_0_037",
+      "kind": "instruction",
+      "scene_id": 0,
+      "instruction": "push the cube into the red marked area",
+      "instruction_zh": "多指令表述 1",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ],
+      "adapter": "results/vla_finetune_tuned/best_adapter",
+      "unnorm_key": "pushcube_vla",
+      "dist_start": 0.2,
+      "dist_end": 0.02651,
+      "dist_min": 0.02651,
+      "success": true,
+      "steps": 31,
+      "frames": 32,
+      "fps": 10,
+      "duration_s": 3.2,
+      "wall_time_s": 44.56,
+      "video": "results/vla_demo/instruction_instruction_0_037/demo.mp4",
+      "video_size_mb": 0.04
+    },
+    {
+      "tag": "instruction_instruction_0_355",
+      "kind": "instruction",
+      "scene_id": 0,
+      "instruction": "push the cube into the red target zone",
+      "instruction_zh": "多指令表述 2",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ],
+      "adapter": "results/vla_finetune_tuned/best_adapter",
+      "unnorm_key": "pushcube_vla",
+      "dist_start": 0.2,
+      "dist_end": 0.018849,
+      "dist_min": 0.018849,
+      "success": true,
+      "steps": 30,
+      "frames": 31,
+      "fps": 10,
+      "duration_s": 3.1,
+      "wall_time_s": 43.1,
+      "video": "results/vla_demo/instruction_instruction_0_355/demo.mp4",
+      "video_size_mb": 0.04
+    },
+    {
+      "tag": "instruction_instruction_0_874",
+      "kind": "instruction",
+      "scene_id": 0,
+      "instruction": "move the cube to the red target",
+      "instruction_zh": "多指令表述 3",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ],
+      "adapter": "results/vla_finetune_tuned/best_adapter",
+      "unnorm_key": "pushcube_vla",
+      "dist_start": 0.2,
+      "dist_end": 0.02765,
+      "dist_min": 0.02765,
+      "success": true,
+      "steps": 28,
+      "frames": 29,
+      "fps": 10,
+      "duration_s": 2.9,
+      "wall_time_s": 40.12,
+      "video": "results/vla_demo/instruction_instruction_0_874/demo.mp4",
+      "video_size_mb": 0.03
+    },
+    {
+      "tag": "position_target_pos_3_824",
+      "kind": "target_pos",
+      "scene_id": 3,
+      "instruction": "push the cube to the red target",
+      "instruction_zh": "位置泛化：目标前移",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.870993,
+        -0.122473
+      ],
+      "adapter": "results/vla_finetune_tuned/best_adapter",
+      "unnorm_key": "pushcube_vla",
+      "dist_start": 0.251005,
+      "dist_end": 0.020132,
+      "dist_min": 0.020132,
+      "success": true,
+      "steps": 30,
+      "frames": 31,
+      "fps": 10,
+      "duration_s": 3.1,
+      "wall_time_s": 42.94,
+      "video": "results/vla_demo/position_target_pos_3_824/demo.mp4",
+      "video_size_mb": 0.04
+    },
+    {
+      "tag": "position_target_pos_14_824",
+      "kind": "target_pos",
+      "scene_id": 14,
+      "instruction": "push the cube to the red target",
+      "instruction_zh": "位置泛化：目标侧移",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.8215,
+        -0.087634
+      ],
+      "adapter": "results/vla_finetune_tuned/best_adapter",
+      "unnorm_key": "pushcube_vla",
+      "dist_start": 0.204083,
+      "dist_end": 0.028375,
+      "dist_min": 0.028375,
+      "success": true,
+      "steps": 38,
+      "frames": 39,
+      "fps": 10,
+      "duration_s": 3.9,
+      "wall_time_s": 54.56,
+      "video": "results/vla_demo/position_target_pos_14_824/demo.mp4",
+      "video_size_mb": 0.04
+    }
+  ],
+  "note": "所有视频均来自真实微调模型闭环 rollout；success 按 <0.03m 判据如实记录。"
+}

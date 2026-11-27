@@ -42,3 +42,6 @@ results/vla_cross_task/*.log
 results/vla_cross_task/*.pid
 results/vla_cross_task/EVAL_DONE
 results/vla_cross_task/FEWSHOT_DONE
+
+# 演示视频：保留 mp4 + meta，逐帧 PNG 可由录制脚本重建，不入库
+results/vla_demo/*/frames/

@@ -1,0 +1,42 @@
+# ============================================================================
+# LoRA rank 消融配置（固定预算）
+# ----------------------------------------------------------------------------
+# 固定 192 步 / lr=1e-4 / seed=42 / alpha=2r，只变 rank。
+# rank 值由命令行 --lora-rank 指定（4 / 8 / 16）。
+# 关键对照：把 lr_scheduler 从 linear 改为 constant 可复现 constant-lr 实验。
+# ============================================================================
+
+paths:
+  model_dir: /data/wzh/robot/models/openvla-7b
+  hf_dataset: /data/wzh/robot/datasets/vla_pushcube_finetune/hf_dataset
+  norm_stats: /data/wzh/robot/datasets/vla_pushcube_finetune/hf_dataset/norm_stats.json
+  out_dir: /data/wzh/robot/vla-world-model-lab/results/vla_ablation_unified
+
+action:
+  action_dim: 7
+  source_action_dim: 4
+  unnorm_key: pushcube_vla
+
+lora:
+  lora_rank: 8               # 由 --lora-rank 覆盖
+  lora_alpha: 16             # 由 --lora-alpha 覆盖；保持 alpha=2r
+  lora_dropout: 0.05
+
+optim:
+  learning_rate: 0.0001
+  weight_decay: 0.0
+  epochs: 10
+  batch_size: 4
+  grad_accum: 4
+  max_grad_norm: 1.0
+  warmup_steps: 0
+  lr_scheduler: linear       # 对照实验改为 constant
+  eval_steps: 48
+  eval_subset_size: 128
+
+runtime:
+  seed: 42
+  device: cuda:0
+
+# 固定预算：由命令行 --max-steps 192 覆盖；此处记录约定值供复现。
+note: "消融固定 192 optimizer 步；rank 用 --lora-rank 切换，alpha 保持 2r"

@@ -1,0 +1,28 @@
+{
+  "tag": "instruction_instruction_0_037",
+  "kind": "instruction",
+  "scene_id": 0,
+  "instruction": "push the cube into the red marked area",
+  "instruction_zh": "多指令表述 1",
+  "cube_xy": [
+    0.62,
+    -0.12
+  ],
+  "target_xy": [
+    0.82,
+    -0.12
+  ],
+  "adapter": "results/vla_finetune_tuned/best_adapter",
+  "unnorm_key": "pushcube_vla",
+  "dist_start": 0.2,
+  "dist_end": 0.02651,
+  "dist_min": 0.02651,
+  "success": true,
+  "steps": 31,
+  "frames": 32,
+  "fps": 10,
+  "duration_s": 3.2,
+  "wall_time_s": 44.56,
+  "video": "results/vla_demo/instruction_instruction_0_037/demo.mp4",
+  "video_size_mb": 0.04
+}

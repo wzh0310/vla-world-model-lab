@@ -1,0 +1,10 @@
+# ============================================================================
+# 一键运行配置：训练管线贯通验证（smoke）
+# 用法: python vla_finetune/run.py --config vla_finetune/configs/run_smoke.yaml
+# ============================================================================
+
+task: train
+entry: 默认配置 + smoke 贯通
+args:
+  profile: default
+  smoke: true

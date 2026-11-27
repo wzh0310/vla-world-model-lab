@@ -1,0 +1,28 @@
+{
+  "tag": "position_target_pos_14_824",
+  "kind": "target_pos",
+  "scene_id": 14,
+  "instruction": "push the cube to the red target",
+  "instruction_zh": "位置泛化：目标侧移",
+  "cube_xy": [
+    0.62,
+    -0.12
+  ],
+  "target_xy": [
+    0.8215,
+    -0.087634
+  ],
+  "adapter": "results/vla_finetune_tuned/best_adapter",
+  "unnorm_key": "pushcube_vla",
+  "dist_start": 0.204083,
+  "dist_end": 0.028375,
+  "dist_min": 0.028375,
+  "success": true,
+  "steps": 38,
+  "frames": 39,
+  "fps": 10,
+  "duration_s": 3.9,
+  "wall_time_s": 54.56,
+  "video": "results/vla_demo/position_target_pos_14_824/demo.mp4",
+  "video_size_mb": 0.04
+}
