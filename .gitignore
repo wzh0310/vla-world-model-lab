@@ -33,3 +33,12 @@ results/vla_ablation/rank8_constlr/CTRL_DONE
 results/vla_generalization/GEN_DONE
 results/vla_generalization/*.log
 results/vla_generalization/*.pid
+
+# 跨任务实验：大权重/可重建数据集/临时产物不入库，保留示教 npz 与 JSON 结果
+results/vla_cross_task/fewshot_adapter/
+results/vla_cross_task/fewshot_smoke/
+results/vla_cross_task/raw_cross/
+results/vla_cross_task/*.log
+results/vla_cross_task/*.pid
+results/vla_cross_task/EVAL_DONE
+results/vla_cross_task/FEWSHOT_DONE

@@ -1,0 +1,214 @@
+{
+  "algorithm": "vla",
+  "adapter": "results/vla_cross_task/fewshot_adapter/adapter",
+  "scenes_file": "results/vla_cross_task/scenes.json",
+  "max_steps": 60,
+  "success_radius_m": 0.03,
+  "instructions": {
+    "left": "把方块推到左边",
+    "right": "把方块推到右边"
+  },
+  "note": "VLA: direct_phys 微调动作映射",
+  "summary": {
+    "left": {
+      "n_episodes": 5,
+      "success_count": 2,
+      "success_rate": 0.4,
+      "mean_dist_improvement": -0.3855
+    },
+    "right": {
+      "n_episodes": 5,
+      "success_count": 4,
+      "success_rate": 0.8,
+      "mean_dist_improvement": 0.1982
+    },
+    "overall": {
+      "n_episodes": 10,
+      "success_count": 6,
+      "success_rate": 0.6,
+      "mean_dist_improvement": -0.0937
+    }
+  },
+  "episodes": [
+    {
+      "task": "left",
+      "scene_id": 0,
+      "instruction": "把方块推到左边",
+      "target_xy": [
+        0.78843,
+        -0.254079
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_start": 0.2153,
+      "dist_end": 0.9554,
+      "dist_min": 0.046,
+      "success": false,
+      "steps": 60
+    },
+    {
+      "task": "left",
+      "scene_id": 1,
+      "instruction": "把方块推到左边",
+      "target_xy": [
+        0.809829,
+        -0.272144
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_start": 0.2433,
+      "dist_end": 1.0026,
+      "dist_min": 0.0358,
+      "success": false,
+      "steps": 60
+    },
+    {
+      "task": "left",
+      "scene_id": 2,
+      "instruction": "把方块推到左边",
+      "target_xy": [
+        0.785252,
+        -0.23356
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_start": 0.2005,
+      "dist_end": 0.0266,
+      "dist_min": 0.0266,
+      "success": true,
+      "steps": 32
+    },
+    {
+      "task": "left",
+      "scene_id": 3,
+      "instruction": "把方块推到左边",
+      "target_xy": [
+        0.80174,
+        -0.25695
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_start": 0.2276,
+      "dist_end": 0.0123,
+      "dist_min": 0.0123,
+      "success": true,
+      "steps": 32
+    },
+    {
+      "task": "left",
+      "scene_id": 4,
+      "instruction": "把方块推到左边",
+      "target_xy": [
+        0.818935,
+        -0.279639
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_start": 0.2551,
+      "dist_end": 1.0724,
+      "dist_min": 0.032,
+      "success": false,
+      "steps": 60
+    },
+    {
+      "task": "right",
+      "scene_id": 5,
+      "instruction": "把方块推到右边",
+      "target_xy": [
+        0.785734,
+        0.007774
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_start": 0.2093,
+      "dist_end": 0.0138,
+      "dist_min": 0.0138,
+      "success": true,
+      "steps": 36
+    },
+    {
+      "task": "right",
+      "scene_id": 6,
+      "instruction": "把方块推到右边",
+      "target_xy": [
+        0.814908,
+        0.025576
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_start": 0.2433,
+      "dist_end": 0.054,
+      "dist_min": 0.0435,
+      "success": false,
+      "steps": 60
+    },
+    {
+      "task": "right",
+      "scene_id": 7,
+      "instruction": "把方块推到右边",
+      "target_xy": [
+        0.778504,
+        -0.003958
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_start": 0.1964,
+      "dist_end": 0.0282,
+      "dist_min": 0.0282,
+      "success": true,
+      "steps": 35
+    },
+    {
+      "task": "right",
+      "scene_id": 8,
+      "instruction": "把方块推到右边",
+      "target_xy": [
+        0.802801,
+        0.024593
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_start": 0.2331,
+      "dist_end": 0.0246,
+      "dist_min": 0.0246,
+      "success": true,
+      "steps": 41
+    },
+    {
+      "task": "right",
+      "scene_id": 9,
+      "instruction": "把方块推到右边",
+      "target_xy": [
+        0.820753,
+        0.040727
+      ],
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist_start": 0.2572,
+      "dist_end": 0.0279,
+      "dist_min": 0.0279,
+      "success": true,
+      "steps": 43
+    }
+  ]
+}

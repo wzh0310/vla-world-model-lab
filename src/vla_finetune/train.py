@@ -46,7 +46,7 @@ from transformers import (
     TrainingArguments,
     set_seed,
 )
-from peft import LoraConfig, get_peft_model
+from peft import LoraConfig, get_peft_model, PeftModel
 
 from vla_finetune.action_utils import ActionNorm, ActionTokenizer, roundtrip_error
 from vla_finetune.trainer_data import HFDatasetForTrainer, TrainerCollator
@@ -82,6 +82,14 @@ def parse_args():
                     help="覆盖 optimizer 总步数（消融固定预算用）")
     ap.add_argument("--lr-scheduler", default=None,
                     help="覆盖学习率调度器（消融对照用，如 constant）")
+    ap.add_argument("--init-adapter", default=None,
+                    help="从已有 adapter 续训（few-shot 跨任务用），加载其 LoRA 权重")
+    ap.add_argument("--hf-dataset", default=None,
+                    help="覆盖 HF 数据集根目录（需含 train/ 与 val/ 子目录）")
+    ap.add_argument("--eval-subset", type=int, default=None,
+                    help="覆盖验证监控子集大小（few-shot 用原任务 val 子集）")
+    ap.add_argument("--eval-steps", type=int, default=None,
+                    help="覆盖 eval_steps；设超大值可跳过 eval（few-shot 直接保存最终 adapter）")
     return ap.parse_args()
 
 
@@ -197,6 +205,15 @@ def main():
     if args.lr_scheduler is not None:
         cfg["lr_scheduler"] = args.lr_scheduler
         print(f"[override] lr_scheduler -> {args.lr_scheduler}", flush=True)
+    if args.hf_dataset is not None:
+        cfg["hf_dataset"] = args.hf_dataset
+        print(f"[override] hf_dataset -> {args.hf_dataset}", flush=True)
+    if args.eval_subset is not None:
+        cfg["eval_subset_size"] = args.eval_subset
+        print(f"[override] eval_subset_size -> {args.eval_subset}", flush=True)
+    if args.eval_steps is not None:
+        cfg["eval_steps"] = args.eval_steps
+        print(f"[override] eval_steps -> {args.eval_steps}", flush=True)
 
     seed = int(cfg.get("seed", 42))
     random.seed(seed)
@@ -275,7 +292,14 @@ def main():
         bias="none",
         task_type="CAUSAL_LM",
     )
-    model = get_peft_model(model, lora_cfg)
+    if args.init_adapter is not None:
+        # few-shot 续训：用 PEFT 官方入口从已有 adapter 加载权重并设为可训练。
+        model = PeftModel.from_pretrained(model, args.init_adapter, is_trainable=True)
+        trainable_chk = sum(p.numel() for p in model.parameters() if p.requires_grad)
+        print(f"[fewshot] init-adapter={args.init_adapter} 续训加载成功 "
+              f"可训练={trainable_chk:,}", flush=True)
+    else:
+        model = get_peft_model(model, lora_cfg)
     if hasattr(model.config, "use_cache"):
         model.config.use_cache = False
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)

@@ -1,0 +1,136 @@
+{
+  "name": "push_cube_left_right_cross_task",
+  "master_seed": 20261127,
+  "cube_start": [
+    0.62,
+    -0.12
+  ],
+  "jitter_m": 0.006,
+  "instruction_map": {
+    "left": "把方块推到左边",
+    "right": "把方块推到右边"
+  },
+  "n_scenes": 10,
+  "scenes": [
+    {
+      "task": "left",
+      "scene_id": 0,
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.78843,
+        -0.254079
+      ]
+    },
+    {
+      "task": "left",
+      "scene_id": 1,
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.809829,
+        -0.272144
+      ]
+    },
+    {
+      "task": "left",
+      "scene_id": 2,
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.785252,
+        -0.23356
+      ]
+    },
+    {
+      "task": "left",
+      "scene_id": 3,
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.80174,
+        -0.25695
+      ]
+    },
+    {
+      "task": "left",
+      "scene_id": 4,
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.818935,
+        -0.279639
+      ]
+    },
+    {
+      "task": "right",
+      "scene_id": 5,
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.785734,
+        0.007774
+      ]
+    },
+    {
+      "task": "right",
+      "scene_id": 6,
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.814908,
+        0.025576
+      ]
+    },
+    {
+      "task": "right",
+      "scene_id": 7,
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.778504,
+        -0.003958
+      ]
+    },
+    {
+      "task": "right",
+      "scene_id": 8,
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.802801,
+        0.024593
+      ]
+    },
+    {
+      "task": "right",
+      "scene_id": 9,
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.820753,
+        0.040727
+      ]
+    }
+  ]
+}

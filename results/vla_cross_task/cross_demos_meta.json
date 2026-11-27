@@ -1,0 +1,117 @@
+{
+  "task": "push_cube_left_right",
+  "total": 5,
+  "counts": {
+    "left": 2,
+    "right": 3
+  },
+  "episodes": [
+    {
+      "task": "left",
+      "instruction": "把方块推到左边",
+      "target_xy": [
+        0.78,
+        -0.24
+      ],
+      "cube_start_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist": 0.00571,
+      "steps": 32,
+      "success": true,
+      "n_frames": 32
+    },
+    {
+      "task": "left",
+      "instruction": "把方块推到左边",
+      "target_xy": [
+        0.78,
+        -0.24
+      ],
+      "cube_start_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist": 0.00571,
+      "steps": 32,
+      "success": true,
+      "n_frames": 32
+    },
+    {
+      "task": "right",
+      "instruction": "把方块推到右边",
+      "target_xy": [
+        0.78,
+        0.01
+      ],
+      "cube_start_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist": 0.01708,
+      "steps": 37,
+      "success": true,
+      "n_frames": 37
+    },
+    {
+      "task": "right",
+      "instruction": "把方块推到右边",
+      "target_xy": [
+        0.78,
+        0.01
+      ],
+      "cube_start_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist": 0.01708,
+      "steps": 37,
+      "success": true,
+      "n_frames": 37
+    },
+    {
+      "task": "right",
+      "instruction": "把方块推到右边",
+      "target_xy": [
+        0.79,
+        0.0
+      ],
+      "cube_start_xy": [
+        0.62,
+        -0.12
+      ],
+      "dist": 0.02504,
+      "steps": 39,
+      "success": true,
+      "n_frames": 39
+    }
+  ],
+  "norm_stats": {
+    "method": "min-max -> [-1,1]",
+    "min": [
+      0.0,
+      -0.009620249271392822,
+      -0.0031751515343785286,
+      0.0
+    ],
+    "max": [
+      0.019999999552965164,
+      0.00800000037997961,
+      0.0,
+      0.0
+    ],
+    "span": [
+      0.019999999552965164,
+      0.017620249651372433,
+      0.0031751515343785286,
+      0.0
+    ],
+    "constant_dims": [
+      3
+    ]
+  },
+  "val_note": "原任务 val 前 64 帧，监控灾难性遗忘；新任务数据不进 val",
+  "train_frames": 177,
+  "val_frames": 64
+}
