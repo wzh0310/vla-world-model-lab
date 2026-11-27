@@ -1,0 +1,84 @@
+{
+  "experiment": "VLA vs ACT generalization",
+  "vla": {
+    "instruction": {
+      "n_episodes": 30,
+      "success_count": 0,
+      "success_rate": 0.0,
+      "mean_dist_improvement": 0.02514,
+      "mean_dist_end": 0.17486,
+      "mean_steps": 47.9
+    },
+    "start_pos": {
+      "n_episodes": 20,
+      "success_count": 3,
+      "success_rate": 0.15,
+      "mean_dist_improvement": 0.052604,
+      "mean_dist_end": 0.148033,
+      "mean_steps": 46.6
+    },
+    "target_pos": {
+      "n_episodes": 20,
+      "success_count": 4,
+      "success_rate": 0.2,
+      "mean_dist_improvement": -0.039752,
+      "mean_dist_end": 0.242711,
+      "mean_steps": 37.45
+    },
+    "overall": {
+      "n_episodes": 70,
+      "success_count": 7,
+      "success_rate": 0.1,
+      "mean_dist_improvement": 0.014447,
+      "mean_dist_end": 0.186581,
+      "mean_steps": 44.54
+    }
+  },
+  "act": {
+    "instruction": {
+      "n_episodes": 30,
+      "success_count": 26,
+      "success_rate": 0.8667,
+      "mean_dist_improvement": 0.1578,
+      "mean_dist_end": 0.0422,
+      "mean_steps": 41.33
+    },
+    "start_pos": {
+      "n_episodes": 20,
+      "success_count": 4,
+      "success_rate": 0.2,
+      "mean_dist_improvement": 0.050516,
+      "mean_dist_end": 0.150121,
+      "mean_steps": 47.15
+    },
+    "target_pos": {
+      "n_episodes": 20,
+      "success_count": 1,
+      "success_rate": 0.05,
+      "mean_dist_improvement": 0.062244,
+      "mean_dist_end": 0.140715,
+      "mean_steps": 49.1
+    },
+    "overall": {
+      "n_episodes": 70,
+      "success_count": 31,
+      "success_rate": 0.4429,
+      "mean_dist_improvement": 0.099846,
+      "mean_dist_end": 0.101182,
+      "mean_steps": 45.21
+    }
+  },
+  "novel_instructions": [
+    "把小木块挪到前面的红圈里",
+    "推动立方体抵达目标标记",
+    "将方块推到红色圆形标记处",
+    "把蓝色小方块送到红色圆盘上",
+    "让立方体滑进桌面的红色目标区",
+    "挪动小方块至红色标记圈中央",
+    "把积木推向前方的红色靶心",
+    "请将蓝色方块移到红色圆标处",
+    "推动小立方体落在红色目标圆环内",
+    "将桌上的方块滑到红色圈圈里"
+  ],
+  "novel_overlap_with_train": []
+}

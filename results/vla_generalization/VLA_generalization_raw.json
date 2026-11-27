@@ -1,0 +1,1470 @@
+{
+  "algorithm": "vla_openvla_lora",
+  "adapter": "results/vla_finetune_tuned/best_adapter",
+  "unnorm_key": "pushcube_vla",
+  "observation": "224x224 RGB + language instruction",
+  "protocol": {
+    "scene_file": "results/vla_generalization/scenes.json",
+    "scene_master_seed": 20261127,
+    "max_steps": 50,
+    "success_radius_m": 0.03,
+    "instruction_mode": "direct_phys (finetuned)",
+    "novel_instructions": [
+      "把小木块挪到前面的红圈里",
+      "推动立方体抵达目标标记",
+      "将方块推到红色圆形标记处",
+      "把蓝色小方块送到红色圆盘上",
+      "让立方体滑进桌面的红色目标区",
+      "挪动小方块至红色标记圈中央",
+      "把积木推向前方的红色靶心",
+      "请将蓝色方块移到红色圆标处",
+      "推动小立方体落在红色目标圆环内",
+      "将桌上的方块滑到红色圈圈里"
+    ],
+    "novel_overlap_with_train": [],
+    "train_instruction_count": 44
+  },
+  "summary": {
+    "instruction": {
+      "n_episodes": 30,
+      "success_count": 0,
+      "success_rate": 0.0,
+      "mean_dist_improvement": 0.02514,
+      "mean_dist_end": 0.17486,
+      "mean_steps": 47.9
+    },
+    "start_pos": {
+      "n_episodes": 20,
+      "success_count": 3,
+      "success_rate": 0.15,
+      "mean_dist_improvement": 0.052604,
+      "mean_dist_end": 0.148033,
+      "mean_steps": 46.6
+    },
+    "target_pos": {
+      "n_episodes": 20,
+      "success_count": 4,
+      "success_rate": 0.2,
+      "mean_dist_improvement": -0.039752,
+      "mean_dist_end": 0.242711,
+      "mean_steps": 37.45
+    },
+    "overall": {
+      "n_episodes": 70,
+      "success_count": 7,
+      "success_rate": 0.1,
+      "mean_dist_improvement": 0.014447,
+      "mean_dist_end": 0.186581,
+      "mean_steps": 44.54
+    }
+  },
+  "per_test": {
+    "instruction": [
+      {
+        "instruction": "把小木块挪到前面的红圈里",
+        "kind": "instruction",
+        "scene_id": 0,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.151865,
+        "dist_min": 0.04977,
+        "dist_improvement": 0.048135,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 45.97
+      },
+      {
+        "instruction": "把小木块挪到前面的红圈里",
+        "kind": "instruction",
+        "scene_id": 1,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.151865,
+        "dist_min": 0.04977,
+        "dist_improvement": 0.048135,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 45.05
+      },
+      {
+        "instruction": "把小木块挪到前面的红圈里",
+        "kind": "instruction",
+        "scene_id": 2,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.151865,
+        "dist_min": 0.04977,
+        "dist_improvement": 0.048135,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 44.97
+      },
+      {
+        "instruction": "推动立方体抵达目标标记",
+        "kind": "instruction",
+        "scene_id": 0,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.340995,
+        "dist_min": 0.091659,
+        "dist_improvement": -0.140995,
+        "success": false,
+        "steps": 34,
+        "wall_time_s": 30.06
+      },
+      {
+        "instruction": "推动立方体抵达目标标记",
+        "kind": "instruction",
+        "scene_id": 1,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.340995,
+        "dist_min": 0.091659,
+        "dist_improvement": -0.140995,
+        "success": false,
+        "steps": 34,
+        "wall_time_s": 29.5
+      },
+      {
+        "instruction": "推动立方体抵达目标标记",
+        "kind": "instruction",
+        "scene_id": 2,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.340995,
+        "dist_min": 0.091659,
+        "dist_improvement": -0.140995,
+        "success": false,
+        "steps": 34,
+        "wall_time_s": 29.76
+      },
+      {
+        "instruction": "将方块推到红色圆形标记处",
+        "kind": "instruction",
+        "scene_id": 0,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.337678,
+        "dist_min": 0.059271,
+        "dist_improvement": -0.137678,
+        "success": false,
+        "steps": 45,
+        "wall_time_s": 38.98
+      },
+      {
+        "instruction": "将方块推到红色圆形标记处",
+        "kind": "instruction",
+        "scene_id": 1,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.337678,
+        "dist_min": 0.059271,
+        "dist_improvement": -0.137678,
+        "success": false,
+        "steps": 45,
+        "wall_time_s": 39.74
+      },
+      {
+        "instruction": "将方块推到红色圆形标记处",
+        "kind": "instruction",
+        "scene_id": 2,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.337678,
+        "dist_min": 0.059271,
+        "dist_improvement": -0.137678,
+        "success": false,
+        "steps": 45,
+        "wall_time_s": 39.75
+      },
+      {
+        "instruction": "把蓝色小方块送到红色圆盘上",
+        "kind": "instruction",
+        "scene_id": 0,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.176983,
+        "dist_min": 0.104592,
+        "dist_improvement": 0.023017,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 44.58
+      },
+      {
+        "instruction": "把蓝色小方块送到红色圆盘上",
+        "kind": "instruction",
+        "scene_id": 1,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.176983,
+        "dist_min": 0.104592,
+        "dist_improvement": 0.023017,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 44.48
+      },
+      {
+        "instruction": "把蓝色小方块送到红色圆盘上",
+        "kind": "instruction",
+        "scene_id": 2,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.176983,
+        "dist_min": 0.104592,
+        "dist_improvement": 0.023017,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 45.54
+      },
+      {
+        "instruction": "让立方体滑进桌面的红色目标区",
+        "kind": "instruction",
+        "scene_id": 0,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.135166,
+        "dist_min": 0.126588,
+        "dist_improvement": 0.064834,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 44.79
+      },
+      {
+        "instruction": "让立方体滑进桌面的红色目标区",
+        "kind": "instruction",
+        "scene_id": 1,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.135166,
+        "dist_min": 0.126588,
+        "dist_improvement": 0.064834,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 44.4
+      },
+      {
+        "instruction": "让立方体滑进桌面的红色目标区",
+        "kind": "instruction",
+        "scene_id": 2,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.135166,
+        "dist_min": 0.126588,
+        "dist_improvement": 0.064834,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 44.74
+      },
+      {
+        "instruction": "挪动小方块至红色标记圈中央",
+        "kind": "instruction",
+        "scene_id": 0,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.103531,
+        "dist_min": 0.10055,
+        "dist_improvement": 0.096469,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 45.89
+      },
+      {
+        "instruction": "挪动小方块至红色标记圈中央",
+        "kind": "instruction",
+        "scene_id": 1,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.103531,
+        "dist_min": 0.10055,
+        "dist_improvement": 0.096469,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 44.97
+      },
+      {
+        "instruction": "挪动小方块至红色标记圈中央",
+        "kind": "instruction",
+        "scene_id": 2,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.103531,
+        "dist_min": 0.10055,
+        "dist_improvement": 0.096469,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 44.12
+      },
+      {
+        "instruction": "把积木推向前方的红色靶心",
+        "kind": "instruction",
+        "scene_id": 0,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.09947,
+        "dist_min": 0.080613,
+        "dist_improvement": 0.10053,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 45.3
+      },
+      {
+        "instruction": "把积木推向前方的红色靶心",
+        "kind": "instruction",
+        "scene_id": 1,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.09947,
+        "dist_min": 0.080613,
+        "dist_improvement": 0.10053,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 44.92
+      },
+      {
+        "instruction": "把积木推向前方的红色靶心",
+        "kind": "instruction",
+        "scene_id": 2,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.09947,
+        "dist_min": 0.080613,
+        "dist_improvement": 0.10053,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 45.61
+      },
+      {
+        "instruction": "请将蓝色方块移到红色圆标处",
+        "kind": "instruction",
+        "scene_id": 0,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.229296,
+        "dist_min": 0.038998,
+        "dist_improvement": -0.029296,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 45.7
+      },
+      {
+        "instruction": "请将蓝色方块移到红色圆标处",
+        "kind": "instruction",
+        "scene_id": 1,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.229296,
+        "dist_min": 0.038998,
+        "dist_improvement": -0.029296,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 44.67
+      },
+      {
+        "instruction": "请将蓝色方块移到红色圆标处",
+        "kind": "instruction",
+        "scene_id": 2,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.229296,
+        "dist_min": 0.038998,
+        "dist_improvement": -0.029296,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 44.65
+      },
+      {
+        "instruction": "推动小立方体落在红色目标圆环内",
+        "kind": "instruction",
+        "scene_id": 0,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.091794,
+        "dist_min": 0.085706,
+        "dist_improvement": 0.108206,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 43.91
+      },
+      {
+        "instruction": "推动小立方体落在红色目标圆环内",
+        "kind": "instruction",
+        "scene_id": 1,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.091794,
+        "dist_min": 0.085706,
+        "dist_improvement": 0.108206,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 44.16
+      },
+      {
+        "instruction": "推动小立方体落在红色目标圆环内",
+        "kind": "instruction",
+        "scene_id": 2,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.091794,
+        "dist_min": 0.085706,
+        "dist_improvement": 0.108206,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 42.31
+      },
+      {
+        "instruction": "将桌上的方块滑到红色圈圈里",
+        "kind": "instruction",
+        "scene_id": 0,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.081818,
+        "dist_min": 0.074305,
+        "dist_improvement": 0.118182,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 46.15
+      },
+      {
+        "instruction": "将桌上的方块滑到红色圈圈里",
+        "kind": "instruction",
+        "scene_id": 1,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.081818,
+        "dist_min": 0.074305,
+        "dist_improvement": 0.118182,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 44.62
+      },
+      {
+        "instruction": "将桌上的方块滑到红色圈圈里",
+        "kind": "instruction",
+        "scene_id": 2,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.081818,
+        "dist_min": 0.074305,
+        "dist_improvement": 0.118182,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 43.34
+      }
+    ],
+    "start_pos": [
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 0,
+        "cube_xy": [
+          0.606915,
+          -0.153988
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.215779,
+        "dist_end": 0.156793,
+        "dist_min": 0.128318,
+        "dist_improvement": 0.058985,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 45.39
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 1,
+        "cube_xy": [
+          0.618572,
+          -0.137869
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.202219,
+        "dist_end": 0.162317,
+        "dist_min": 0.098751,
+        "dist_improvement": 0.039902,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 42.51
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 2,
+        "cube_xy": [
+          0.663769,
+          -0.149668
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.159023,
+        "dist_end": 0.020648,
+        "dist_min": 0.020648,
+        "dist_improvement": 0.138375,
+        "success": true,
+        "steps": 35,
+        "wall_time_s": 29.83
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 3,
+        "cube_xy": [
+          0.634501,
+          -0.094584
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.187232,
+        "dist_end": 0.109145,
+        "dist_min": 0.052611,
+        "dist_improvement": 0.078087,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 42.53
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 4,
+        "cube_xy": [
+          0.611129,
+          -0.116995
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.208893,
+        "dist_end": 0.012273,
+        "dist_min": 0.012273,
+        "dist_improvement": 0.196619,
+        "success": true,
+        "steps": 30,
+        "wall_time_s": 25.8
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 5,
+        "cube_xy": [
+          0.584452,
+          -0.138548
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.236277,
+        "dist_end": 0.248569,
+        "dist_min": 0.103557,
+        "dist_improvement": -0.012292,
+        "success": false,
+        "steps": 42,
+        "wall_time_s": 37.4
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 6,
+        "cube_xy": [
+          0.660896,
+          -0.156864
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.163319,
+        "dist_end": 0.08771,
+        "dist_min": 0.062424,
+        "dist_improvement": 0.075609,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 43.91
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 7,
+        "cube_xy": [
+          0.607531,
+          -0.152982
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.215014,
+        "dist_end": 0.166596,
+        "dist_min": 0.120813,
+        "dist_improvement": 0.048418,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 44.64
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 8,
+        "cube_xy": [
+          0.643342,
+          -0.081724
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.180757,
+        "dist_end": 0.020129,
+        "dist_min": 0.020129,
+        "dist_improvement": 0.160629,
+        "success": true,
+        "steps": 30,
+        "wall_time_s": 27.59
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 9,
+        "cube_xy": [
+          0.626272,
+          -0.113945
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.193823,
+        "dist_end": 0.131932,
+        "dist_min": 0.065158,
+        "dist_improvement": 0.061891,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 43.36
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 10,
+        "cube_xy": [
+          0.665055,
+          -0.154745
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.158793,
+        "dist_end": 0.095324,
+        "dist_min": 0.069988,
+        "dist_improvement": 0.063469,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 44.82
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 11,
+        "cube_xy": [
+          0.608554,
+          -0.107889
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.211793,
+        "dist_end": 0.074467,
+        "dist_min": 0.061874,
+        "dist_improvement": 0.137326,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 44.15
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 12,
+        "cube_xy": [
+          0.633636,
+          -0.160515
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.190717,
+        "dist_end": 0.088699,
+        "dist_min": 0.031659,
+        "dist_improvement": 0.102019,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 44.84
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 13,
+        "cube_xy": [
+          0.627128,
+          -0.16055
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.197089,
+        "dist_end": 0.109772,
+        "dist_min": 0.102025,
+        "dist_improvement": 0.087316,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 45.24
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 14,
+        "cube_xy": [
+          0.580864,
+          -0.07965
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.242516,
+        "dist_end": 0.099664,
+        "dist_min": 0.068642,
+        "dist_improvement": 0.142853,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 45.58
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 15,
+        "cube_xy": [
+          0.606614,
+          -0.151035
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.215631,
+        "dist_end": 0.235789,
+        "dist_min": 0.144622,
+        "dist_improvement": -0.020158,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 42.81
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 16,
+        "cube_xy": [
+          0.649024,
+          -0.16505
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.176811,
+        "dist_end": 0.474438,
+        "dist_min": 0.040172,
+        "dist_improvement": -0.297627,
+        "success": false,
+        "steps": 45,
+        "wall_time_s": 40.33
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 17,
+        "cube_xy": [
+          0.615978,
+          -0.143658
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.205389,
+        "dist_end": 0.111762,
+        "dist_min": 0.098201,
+        "dist_improvement": 0.093627,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 43.79
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 18,
+        "cube_xy": [
+          0.603134,
+          -0.086945
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.219371,
+        "dist_end": 0.404058,
+        "dist_min": 0.087374,
+        "dist_improvement": -0.184688,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 43.93
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "start_pos",
+        "scene_id": 19,
+        "cube_xy": [
+          0.588855,
+          -0.096848
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.232302,
+        "dist_end": 0.150581,
+        "dist_min": 0.122616,
+        "dist_improvement": 0.08172,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 44.56
+      }
+    ],
+    "target_pos": [
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 0,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.863113,
+          -0.112219
+        ],
+        "dist_start": 0.243237,
+        "dist_end": 0.315934,
+        "dist_min": 0.104463,
+        "dist_improvement": -0.072696,
+        "success": false,
+        "steps": 37,
+        "wall_time_s": 32.29
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 1,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.849871,
+          -0.122944
+        ],
+        "dist_start": 0.22989,
+        "dist_end": 0.322815,
+        "dist_min": 0.09221,
+        "dist_improvement": -0.092925,
+        "success": false,
+        "steps": 37,
+        "wall_time_s": 33.34
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 2,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.866402,
+          -0.118544
+        ],
+        "dist_start": 0.246406,
+        "dist_end": 0.322925,
+        "dist_min": 0.096675,
+        "dist_improvement": -0.076519,
+        "success": false,
+        "steps": 38,
+        "wall_time_s": 33.79
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 3,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.870993,
+          -0.122473
+        ],
+        "dist_start": 0.251005,
+        "dist_end": 0.027867,
+        "dist_min": 0.027867,
+        "dist_improvement": 0.223138,
+        "success": true,
+        "steps": 30,
+        "wall_time_s": 26.38
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 4,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.860649,
+          -0.12495
+        ],
+        "dist_start": 0.2407,
+        "dist_end": 0.195682,
+        "dist_min": 0.03364,
+        "dist_improvement": 0.045018,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 43.72
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 5,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.779923,
+          -0.125188
+        ],
+        "dist_start": 0.160007,
+        "dist_end": 0.348207,
+        "dist_min": 0.065668,
+        "dist_improvement": -0.1882,
+        "success": false,
+        "steps": 36,
+        "wall_time_s": 30.78
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 6,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.784632,
+          -0.114312
+        ],
+        "dist_start": 0.16473,
+        "dist_end": 0.382811,
+        "dist_min": 0.06839,
+        "dist_improvement": -0.21808,
+        "success": false,
+        "steps": 36,
+        "wall_time_s": 32.02
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 7,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.768396,
+          -0.122233
+        ],
+        "dist_start": 0.148413,
+        "dist_end": 0.431948,
+        "dist_min": 0.039024,
+        "dist_improvement": -0.283535,
+        "success": false,
+        "steps": 40,
+        "wall_time_s": 35.46
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 8,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.781416,
+          -0.121654
+        ],
+        "dist_start": 0.161424,
+        "dist_end": 0.295784,
+        "dist_min": 0.081388,
+        "dist_improvement": -0.13436,
+        "success": false,
+        "steps": 34,
+        "wall_time_s": 30.98
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 9,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.795292,
+          -0.116045
+        ],
+        "dist_start": 0.175337,
+        "dist_end": 0.378537,
+        "dist_min": 0.05643,
+        "dist_improvement": -0.203201,
+        "success": false,
+        "steps": 39,
+        "wall_time_s": 34.06
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 10,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.81297,
+          -0.087394
+        ],
+        "dist_start": 0.195705,
+        "dist_end": 0.415082,
+        "dist_min": 0.116434,
+        "dist_improvement": -0.219377,
+        "success": false,
+        "steps": 39,
+        "wall_time_s": 34.75
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 11,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.813709,
+          -0.070541
+        ],
+        "dist_start": 0.199923,
+        "dist_end": 0.276183,
+        "dist_min": 0.165634,
+        "dist_improvement": -0.076259,
+        "success": false,
+        "steps": 31,
+        "wall_time_s": 27.99
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 12,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82774,
+          -0.077709
+        ],
+        "dist_start": 0.212001,
+        "dist_end": 0.280327,
+        "dist_min": 0.152571,
+        "dist_improvement": -0.068326,
+        "success": false,
+        "steps": 32,
+        "wall_time_s": 27.24
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 13,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.814267,
+          -0.071704
+        ],
+        "dist_start": 0.20018,
+        "dist_end": 0.280415,
+        "dist_min": 0.158482,
+        "dist_improvement": -0.080235,
+        "success": false,
+        "steps": 31,
+        "wall_time_s": 25.87
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 14,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.8215,
+          -0.087634
+        ],
+        "dist_start": 0.204083,
+        "dist_end": 0.023178,
+        "dist_min": 0.023178,
+        "dist_improvement": 0.180905,
+        "success": true,
+        "steps": 32,
+        "wall_time_s": 29.05
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 15,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82609,
+          -0.167593
+        ],
+        "dist_start": 0.211514,
+        "dist_end": 0.020097,
+        "dist_min": 0.020097,
+        "dist_improvement": 0.191417,
+        "success": true,
+        "steps": 28,
+        "wall_time_s": 25.63
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 16,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.81701,
+          -0.157326
+        ],
+        "dist_start": 0.200515,
+        "dist_end": 0.160714,
+        "dist_min": 0.127369,
+        "dist_improvement": 0.039801,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 43.64
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 17,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.822419,
+          -0.15205
+        ],
+        "dist_start": 0.204941,
+        "dist_end": 0.014815,
+        "dist_min": 0.014815,
+        "dist_improvement": 0.190126,
+        "success": true,
+        "steps": 29,
+        "wall_time_s": 26.11
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 18,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.81747,
+          -0.159729
+        ],
+        "dist_start": 0.201427,
+        "dist_end": 0.162967,
+        "dist_min": 0.129642,
+        "dist_improvement": 0.03846,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 44.85
+      },
+      {
+        "instruction": "push the cube to the red target",
+        "kind": "target_pos",
+        "scene_id": 19,
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.821884,
+          -0.168995
+        ],
+        "dist_start": 0.207744,
+        "dist_end": 0.19793,
+        "dist_min": 0.142062,
+        "dist_improvement": 0.009815,
+        "success": false,
+        "steps": 50,
+        "wall_time_s": 43.29
+      }
+    ]
+  },
+  "total_wall_s": 2775.42
+}

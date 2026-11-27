@@ -1,0 +1,557 @@
+{
+  "name": "push_cube_vla_generalization_scenes",
+  "master_seed": 20261127,
+  "default_cube_xy": [
+    0.62,
+    -0.12
+  ],
+  "default_target_xy": [
+    0.82,
+    -0.12
+  ],
+  "ranges": {
+    "start_offset_m": 0.05,
+    "target_offset_m": 0.05,
+    "n_start_scenes": 20,
+    "n_target_scenes": 20,
+    "success_radius_m": 0.03
+  },
+  "scenes": [
+    {
+      "kind": "instruction",
+      "scene_id": 0,
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "instruction",
+      "scene_id": 1,
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "instruction",
+      "scene_id": 2,
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 0,
+      "cube_xy": [
+        0.606915,
+        -0.153988
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 1,
+      "cube_xy": [
+        0.618572,
+        -0.137869
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 2,
+      "cube_xy": [
+        0.663769,
+        -0.149668
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 3,
+      "cube_xy": [
+        0.634501,
+        -0.094584
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 4,
+      "cube_xy": [
+        0.611129,
+        -0.116995
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 5,
+      "cube_xy": [
+        0.584452,
+        -0.138548
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 6,
+      "cube_xy": [
+        0.660896,
+        -0.156864
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 7,
+      "cube_xy": [
+        0.607531,
+        -0.152982
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 8,
+      "cube_xy": [
+        0.643342,
+        -0.081724
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 9,
+      "cube_xy": [
+        0.626272,
+        -0.113945
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 10,
+      "cube_xy": [
+        0.665055,
+        -0.154745
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 11,
+      "cube_xy": [
+        0.608554,
+        -0.107889
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 12,
+      "cube_xy": [
+        0.633636,
+        -0.160515
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 13,
+      "cube_xy": [
+        0.627128,
+        -0.16055
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 14,
+      "cube_xy": [
+        0.580864,
+        -0.07965
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 15,
+      "cube_xy": [
+        0.606614,
+        -0.151035
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 16,
+      "cube_xy": [
+        0.649024,
+        -0.16505
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 17,
+      "cube_xy": [
+        0.615978,
+        -0.143658
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 18,
+      "cube_xy": [
+        0.603134,
+        -0.086945
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "start_pos",
+      "scene_id": 19,
+      "cube_xy": [
+        0.588855,
+        -0.096848
+      ],
+      "target_xy": [
+        0.82,
+        -0.12
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 0,
+      "direction": "right",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.863113,
+        -0.112219
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 1,
+      "direction": "right",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.849871,
+        -0.122944
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 2,
+      "direction": "right",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.866402,
+        -0.118544
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 3,
+      "direction": "right",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.870993,
+        -0.122473
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 4,
+      "direction": "right",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.860649,
+        -0.12495
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 5,
+      "direction": "left",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.779923,
+        -0.125188
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 6,
+      "direction": "left",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.784632,
+        -0.114312
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 7,
+      "direction": "left",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.768396,
+        -0.122233
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 8,
+      "direction": "left",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.781416,
+        -0.121654
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 9,
+      "direction": "left",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.795292,
+        -0.116045
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 10,
+      "direction": "back",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.81297,
+        -0.087394
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 11,
+      "direction": "back",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.813709,
+        -0.070541
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 12,
+      "direction": "back",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.82774,
+        -0.077709
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 13,
+      "direction": "back",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.814267,
+        -0.071704
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 14,
+      "direction": "back",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.8215,
+        -0.087634
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 15,
+      "direction": "front",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.82609,
+        -0.167593
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 16,
+      "direction": "front",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.81701,
+        -0.157326
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 17,
+      "direction": "front",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.822419,
+        -0.15205
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 18,
+      "direction": "front",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.81747,
+        -0.159729
+      ]
+    },
+    {
+      "kind": "target_pos",
+      "scene_id": 19,
+      "direction": "front",
+      "cube_xy": [
+        0.62,
+        -0.12
+      ],
+      "target_xy": [
+        0.821884,
+        -0.168995
+      ]
+    }
+  ]
+}

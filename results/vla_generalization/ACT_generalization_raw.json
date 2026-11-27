@@ -1,0 +1,1328 @@
+{
+  "algorithm": "act",
+  "checkpoint": "/data/wzh/robot/outputs/act_chunk40/checkpoints/004000",
+  "observation": "224x224 RGB + 13-d state (ACT; no language conditioning)",
+  "protocol": {
+    "scene_file": "results/vla_generalization/scenes.json",
+    "scene_master_seed": 20261127,
+    "max_steps": 50,
+    "success_radius_m": 0.03,
+    "seed_base": 900000,
+    "instruction_note": "ACT has no language input; instruction test is fixed-scene repetition, not language generalization",
+    "novel_instructions": [
+      "把小木块挪到前面的红圈里",
+      "推动立方体抵达目标标记",
+      "将方块推到红色圆形标记处",
+      "把蓝色小方块送到红色圆盘上",
+      "让立方体滑进桌面的红色目标区",
+      "挪动小方块至红色标记圈中央",
+      "把积木推向前方的红色靶心",
+      "请将蓝色方块移到红色圆标处",
+      "推动小立方体落在红色目标圆环内",
+      "将桌上的方块滑到红色圈圈里"
+    ]
+  },
+  "summary": {
+    "instruction": {
+      "n_episodes": 30,
+      "success_count": 26,
+      "success_rate": 0.8667,
+      "mean_dist_improvement": 0.1578,
+      "mean_dist_end": 0.0422,
+      "mean_steps": 41.33
+    },
+    "start_pos": {
+      "n_episodes": 20,
+      "success_count": 4,
+      "success_rate": 0.2,
+      "mean_dist_improvement": 0.050516,
+      "mean_dist_end": 0.150121,
+      "mean_steps": 47.15
+    },
+    "target_pos": {
+      "n_episodes": 20,
+      "success_count": 1,
+      "success_rate": 0.05,
+      "mean_dist_improvement": 0.062244,
+      "mean_dist_end": 0.140715,
+      "mean_steps": 49.1
+    },
+    "overall": {
+      "n_episodes": 70,
+      "success_count": 31,
+      "success_rate": 0.4429,
+      "mean_dist_improvement": 0.099846,
+      "mean_dist_end": 0.101182,
+      "mean_steps": 45.21
+    }
+  },
+  "per_test": {
+    "instruction": [
+      {
+        "scene_id": 0,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.070485,
+        "dist_improvement": 0.129515,
+        "success": false,
+        "steps": 50,
+        "reward": -0.3228
+      },
+      {
+        "scene_id": 1,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.2,
+        "dist_improvement": -0.0,
+        "success": false,
+        "steps": 50,
+        "reward": -2.8824
+      },
+      {
+        "scene_id": 2,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.190574,
+        "dist_improvement": 0.009426,
+        "success": false,
+        "steps": 50,
+        "reward": -1.589
+      },
+      {
+        "scene_id": 0,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.040677,
+        "dist_improvement": 0.159323,
+        "success": false,
+        "steps": 50,
+        "reward": -0.1546
+      },
+      {
+        "scene_id": 1,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 2,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 0,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 1,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 2,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 0,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 1,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 2,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 0,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 1,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 2,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 0,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 1,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 2,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 0,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 1,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 2,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 0,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 1,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 2,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 0,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 1,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 2,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 0,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 1,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      },
+      {
+        "scene_id": 2,
+        "kind": "instruction",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.2,
+        "dist_end": 0.029395,
+        "dist_improvement": 0.170605,
+        "success": true,
+        "steps": 40,
+        "reward": 10.3525
+      }
+    ],
+    "start_pos": [
+      {
+        "scene_id": 0,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.606915,
+          -0.153988
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.215779,
+        "dist_end": 0.024459,
+        "dist_improvement": 0.19132,
+        "success": true,
+        "steps": 36,
+        "reward": 10.6583
+      },
+      {
+        "scene_id": 1,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.618572,
+          -0.137869
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.202219,
+        "dist_end": 0.154008,
+        "dist_improvement": 0.048211,
+        "success": false,
+        "steps": 50,
+        "reward": -1.3452
+      },
+      {
+        "scene_id": 2,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.663769,
+          -0.149668
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.159023,
+        "dist_end": 0.159023,
+        "dist_improvement": -0.0,
+        "success": false,
+        "steps": 50,
+        "reward": -3.2522
+      },
+      {
+        "scene_id": 3,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.634501,
+          -0.094584
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.187232,
+        "dist_end": 0.166336,
+        "dist_improvement": 0.020896,
+        "success": false,
+        "steps": 50,
+        "reward": -1.4138
+      },
+      {
+        "scene_id": 4,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.611129,
+          -0.116995
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.208893,
+        "dist_end": 0.126782,
+        "dist_improvement": 0.08211,
+        "success": false,
+        "steps": 50,
+        "reward": -1.0627
+      },
+      {
+        "scene_id": 5,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.584452,
+          -0.138548
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.236277,
+        "dist_end": 0.105123,
+        "dist_improvement": 0.131154,
+        "success": false,
+        "steps": 50,
+        "reward": -0.4114
+      },
+      {
+        "scene_id": 6,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.660896,
+          -0.156864
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.163319,
+        "dist_end": 0.163319,
+        "dist_improvement": -0.0,
+        "success": false,
+        "steps": 50,
+        "reward": -3.247
+      },
+      {
+        "scene_id": 7,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.607531,
+          -0.152982
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.215014,
+        "dist_end": 0.215014,
+        "dist_improvement": -0.0,
+        "success": false,
+        "steps": 50,
+        "reward": -1.7587
+      },
+      {
+        "scene_id": 8,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.643342,
+          -0.081724
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.180757,
+        "dist_end": 0.021136,
+        "dist_improvement": 0.159621,
+        "success": true,
+        "steps": 34,
+        "reward": 10.1297
+      },
+      {
+        "scene_id": 9,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.626272,
+          -0.113945
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.193823,
+        "dist_end": 0.164497,
+        "dist_improvement": 0.029325,
+        "success": false,
+        "steps": 50,
+        "reward": -1.3672
+      },
+      {
+        "scene_id": 10,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.665055,
+          -0.154745
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.158793,
+        "dist_end": 0.158285,
+        "dist_improvement": 0.000507,
+        "success": false,
+        "steps": 50,
+        "reward": -1.7737
+      },
+      {
+        "scene_id": 11,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.608554,
+          -0.107889
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.211793,
+        "dist_end": 0.497343,
+        "dist_improvement": -0.285551,
+        "success": false,
+        "steps": 50,
+        "reward": -6.0097
+      },
+      {
+        "scene_id": 12,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.633636,
+          -0.160515
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.190717,
+        "dist_end": 0.190717,
+        "dist_improvement": -0.0,
+        "success": false,
+        "steps": 50,
+        "reward": -2.9727
+      },
+      {
+        "scene_id": 13,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.627128,
+          -0.16055
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.197089,
+        "dist_end": 0.197089,
+        "dist_improvement": 0.0,
+        "success": false,
+        "steps": 50,
+        "reward": -1.8227
+      },
+      {
+        "scene_id": 14,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.580864,
+          -0.07965
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.242516,
+        "dist_end": 0.063186,
+        "dist_improvement": 0.17933,
+        "success": false,
+        "steps": 50,
+        "reward": 0.1899
+      },
+      {
+        "scene_id": 15,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.606614,
+          -0.151035
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.215631,
+        "dist_end": 0.029162,
+        "dist_improvement": 0.186469,
+        "success": true,
+        "steps": 34,
+        "reward": 10.6532
+      },
+      {
+        "scene_id": 16,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.649024,
+          -0.16505
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.176811,
+        "dist_end": 0.172359,
+        "dist_improvement": 0.004452,
+        "success": false,
+        "steps": 50,
+        "reward": -1.6351
+      },
+      {
+        "scene_id": 17,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.615978,
+          -0.143658
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.205389,
+        "dist_end": 0.205389,
+        "dist_improvement": -0.0,
+        "success": false,
+        "steps": 50,
+        "reward": -3.0798
+      },
+      {
+        "scene_id": 18,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.603134,
+          -0.086945
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.219371,
+        "dist_end": 0.167959,
+        "dist_improvement": 0.051412,
+        "success": false,
+        "steps": 50,
+        "reward": -1.023
+      },
+      {
+        "scene_id": 19,
+        "kind": "start_pos",
+        "cube_xy": [
+          0.588855,
+          -0.096848
+        ],
+        "target_xy": [
+          0.82,
+          -0.12
+        ],
+        "dist_start": 0.232302,
+        "dist_end": 0.021231,
+        "dist_improvement": 0.211071,
+        "success": true,
+        "steps": 39,
+        "reward": 10.6425
+      }
+    ],
+    "target_pos": [
+      {
+        "scene_id": 0,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.863113,
+          -0.112219
+        ],
+        "dist_start": 0.243237,
+        "dist_end": 0.191408,
+        "dist_improvement": 0.051829,
+        "success": false,
+        "steps": 50,
+        "reward": -1.2065
+      },
+      {
+        "scene_id": 1,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.849871,
+          -0.122944
+        ],
+        "dist_start": 0.22989,
+        "dist_end": 0.113587,
+        "dist_improvement": 0.116302,
+        "success": false,
+        "steps": 50,
+        "reward": -0.575
+      },
+      {
+        "scene_id": 2,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.866402,
+          -0.118544
+        ],
+        "dist_start": 0.246406,
+        "dist_end": 0.065647,
+        "dist_improvement": 0.180759,
+        "success": false,
+        "steps": 50,
+        "reward": 0.0213
+      },
+      {
+        "scene_id": 3,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.870993,
+          -0.122473
+        ],
+        "dist_start": 0.251005,
+        "dist_end": 0.116669,
+        "dist_improvement": 0.134336,
+        "success": false,
+        "steps": 50,
+        "reward": -0.3774
+      },
+      {
+        "scene_id": 4,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.860649,
+          -0.12495
+        ],
+        "dist_start": 0.2407,
+        "dist_end": 0.08127,
+        "dist_improvement": 0.15943,
+        "success": false,
+        "steps": 50,
+        "reward": -0.1478
+      },
+      {
+        "scene_id": 5,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.779923,
+          -0.125188
+        ],
+        "dist_start": 0.160007,
+        "dist_end": 0.179724,
+        "dist_improvement": -0.019716,
+        "success": false,
+        "steps": 50,
+        "reward": -2.0763
+      },
+      {
+        "scene_id": 6,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.784632,
+          -0.114312
+        ],
+        "dist_start": 0.16473,
+        "dist_end": 0.079978,
+        "dist_improvement": 0.084753,
+        "success": false,
+        "steps": 50,
+        "reward": -0.7219
+      },
+      {
+        "scene_id": 7,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.768396,
+          -0.122233
+        ],
+        "dist_start": 0.148413,
+        "dist_end": 0.023754,
+        "dist_improvement": 0.124659,
+        "success": true,
+        "steps": 32,
+        "reward": 10.0134
+      },
+      {
+        "scene_id": 8,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.781416,
+          -0.121654
+        ],
+        "dist_start": 0.161424,
+        "dist_end": 0.099228,
+        "dist_improvement": 0.062196,
+        "success": false,
+        "steps": 50,
+        "reward": -1.1144
+      },
+      {
+        "scene_id": 9,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.795292,
+          -0.116045
+        ],
+        "dist_start": 0.175337,
+        "dist_end": 0.093404,
+        "dist_improvement": 0.081933,
+        "success": false,
+        "steps": 50,
+        "reward": -0.7864
+      },
+      {
+        "scene_id": 10,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.81297,
+          -0.087394
+        ],
+        "dist_start": 0.195705,
+        "dist_end": 0.121387,
+        "dist_improvement": 0.074318,
+        "success": false,
+        "steps": 50,
+        "reward": -0.8286
+      },
+      {
+        "scene_id": 11,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.813709,
+          -0.070541
+        ],
+        "dist_start": 0.199923,
+        "dist_end": 0.172921,
+        "dist_improvement": 0.027002,
+        "success": false,
+        "steps": 50,
+        "reward": -1.4763
+      },
+      {
+        "scene_id": 12,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82774,
+          -0.077709
+        ],
+        "dist_start": 0.212001,
+        "dist_end": 0.198359,
+        "dist_improvement": 0.013642,
+        "success": false,
+        "steps": 50,
+        "reward": -1.6603
+      },
+      {
+        "scene_id": 13,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.814267,
+          -0.071704
+        ],
+        "dist_start": 0.20018,
+        "dist_end": 0.187239,
+        "dist_improvement": 0.012942,
+        "success": false,
+        "steps": 50,
+        "reward": -1.7558
+      },
+      {
+        "scene_id": 14,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.8215,
+          -0.087634
+        ],
+        "dist_start": 0.204083,
+        "dist_end": 0.185724,
+        "dist_improvement": 0.018359,
+        "success": false,
+        "steps": 50,
+        "reward": -1.6013
+      },
+      {
+        "scene_id": 15,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.82609,
+          -0.167593
+        ],
+        "dist_start": 0.211514,
+        "dist_end": 0.186111,
+        "dist_improvement": 0.025403,
+        "success": false,
+        "steps": 50,
+        "reward": -1.3688
+      },
+      {
+        "scene_id": 16,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.81701,
+          -0.157326
+        ],
+        "dist_start": 0.200515,
+        "dist_end": 0.172111,
+        "dist_improvement": 0.028403,
+        "success": false,
+        "steps": 50,
+        "reward": -1.3188
+      },
+      {
+        "scene_id": 17,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.822419,
+          -0.15205
+        ],
+        "dist_start": 0.204941,
+        "dist_end": 0.179385,
+        "dist_improvement": 0.025556,
+        "success": false,
+        "steps": 50,
+        "reward": -1.3304
+      },
+      {
+        "scene_id": 18,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.81747,
+          -0.159729
+        ],
+        "dist_start": 0.201427,
+        "dist_end": 0.179345,
+        "dist_improvement": 0.022081,
+        "success": false,
+        "steps": 50,
+        "reward": -1.3546
+      },
+      {
+        "scene_id": 19,
+        "kind": "target_pos",
+        "cube_xy": [
+          0.62,
+          -0.12
+        ],
+        "target_xy": [
+          0.821884,
+          -0.168995
+        ],
+        "dist_start": 0.207744,
+        "dist_end": 0.187041,
+        "dist_improvement": 0.020703,
+        "success": false,
+        "steps": 50,
+        "reward": -1.3496
+      }
+    ]
+  },
+  "total_wall_s": 445.58
+}

@@ -28,3 +28,8 @@ results/vla_ablation/*.log
 results/vla_ablation/DONE
 results/vla_ablation/SUMMARIZED
 results/vla_ablation/rank8_constlr/CTRL_DONE
+
+# 泛化测试哨兵文件与日志
+results/vla_generalization/GEN_DONE
+results/vla_generalization/*.log
+results/vla_generalization/*.pid
